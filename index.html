@@ -23,6 +23,7 @@ body{
   background:#fff;
   padding:20px;
   border-radius:10px;
+  margin-bottom:20px;
 }
 
 .grid{
@@ -47,37 +48,37 @@ body{
 
 <div class="container">
 
-<div id="loginBox" class="card">
-  <h2>Login ADM</h2>
-  <input id="email" placeholder="Email"><br><br>
-  <input id="senha" type="password" placeholder="Senha"><br><br>
-  <button onclick="login()">Entrar</button>
-</div>
-
-<div id="painel" class="card" style="display:none;">
-  <h2>Universidades</h2>
-
-  <div class="grid">
-    <button class="btn" onclick="abrirUniversidade('estacio')">Estácio</button>
-    <button class="btn" onclick="abrirUniversidade('usp')">USP</button>
-    <button class="btn" onclick="abrirUniversidade('anhanguera')">Anhanguera</button>
+  <div id="loginBox" class="card">
+    <h2>Login ADM</h2>
+    <input id="email" placeholder="Email"><br><br>
+    <input id="senha" type="password" placeholder="Senha"><br><br>
+    <button onclick="login()">Entrar</button>
   </div>
 
-  <br>
-  <button onclick="logout()">Sair</button>
-</div>
+  <div id="painel" class="card" style="display:none;">
+    <h2>Universidades</h2>
 
-<div id="listaAlunos" class="card" style="display:none;">
-  <h2 id="tituloUniversidade"></h2>
+    <div class="grid">
+      <button class="btn" onclick="abrirUniversidade('estacio')">Estácio</button>
+      <button class="btn" onclick="abrirUniversidade('usp')">USP</button>
+      <button class="btn" onclick="abrirUniversidade('anhanguera')">Anhanguera</button>
+    </div>
 
-  <button onclick="voltar()">⬅ Voltar</button>
-  <br><br>
+    <br>
+    <button onclick="logout()">Sair</button>
+  </div>
 
-  <div id="alunos"></div>
+  <div id="listaAlunos" class="card" style="display:none;">
+    <h2 id="tituloUniversidade"></h2>
 
-  <br>
-  <button onclick="novoAluno()">+ Novo aluno</button>
-</div>
+    <button onclick="voltar()">⬅ Voltar</button>
+    <br><br>
+
+    <div id="alunos"></div>
+
+    <br>
+    <button onclick="novoAluno()">+ Novo aluno</button>
+  </div>
 
 </div>
 
@@ -103,8 +104,8 @@ async function login(){
     return;
   }
 
-  document.getElementById("loginBox").style.display="none";
-  document.getElementById("painel").style.display="block";
+  document.getElementById("loginBox").style.display = "none";
+  document.getElementById("painel").style.display = "block";
 }
 
 async function logout(){
@@ -115,51 +116,79 @@ async function logout(){
 async function abrirUniversidade(slug){
   universidadeAtual = slug;
 
-  document.getElementById("painel").style.display="none";
-  document.getElementById("listaAlunos").style.display="block";
-
+  document.getElementById("painel").style.display = "none";
+  document.getElementById("listaAlunos").style.display = "block";
   document.getElementById("tituloUniversidade").innerText = slug.toUpperCase();
 
   carregarAlunos();
 }
 
 function voltar(){
-  document.getElementById("listaAlunos").style.display="none";
-  document.getElementById("painel").style.display="block";
+  document.getElementById("listaAlunos").style.display = "none";
+  document.getElementById("painel").style.display = "block";
 }
 
 async function carregarAlunos(){
-  const { data } = await banco
+  const { data, error } = await banco
     .from("registros")
     .select("*")
     .eq("universidade_slug", universidadeAtual);
 
+  if(error){
+    alert("Erro ao carregar alunos");
+    console.error(error);
+    return;
+  }
+
   let html = "";
 
-  data.forEach(aluno => {
-    html += `<div onclick="editarAluno(${aluno.id})" 
-style="padding:10px;border-bottom:1px solid #ddd;cursor:pointer;">
-  ${aluno.nome} - ${aluno.curso}
-</div>`;
+  if(!data || data.length === 0){
+    html = "<div>Nenhum aluno cadastrado.</div>";
+  } else {
+    data.forEach(aluno => {
+      html += `
+        <div onclick="editarAluno(${aluno.id})"
+          style="padding:10px;border-bottom:1px solid #ddd;cursor:pointer;">
+          ${aluno.nome} - ${aluno.curso}
+        </div>
+      `;
+    });
+  }
+
+  document.getElementById("alunos").innerHTML = html;
+}
 
 function novoAluno(){
   alert("Vamos criar o formulário no próximo passo 😄");
 }
-    async function editarAluno(id){
-  const { data } = await banco
+
+async function editarAluno(id){
+  const { data, error } = await banco
     .from("registros")
     .select("*")
     .eq("id", id)
     .single();
 
+  if(error){
+    alert("Erro ao buscar aluno");
+    console.error(error);
+    return;
+  }
+
   const aluno = data;
 
-  const nome = prompt("Nome:", aluno.nome);
-  const curso = prompt("Curso:", aluno.curso);
-  const status = prompt("Status (Ativo/Concluído):", aluno.status);
+  const nome = prompt("Nome:", aluno.nome || "");
+  if (nome === null) return;
+
+  const curso = prompt("Curso:", aluno.curso || "");
+  if (curso === null) return;
+
+  const status = prompt("Status (Ativo/Concluído):", aluno.status || "");
+  if (status === null) return;
+
   const atrasado = confirm("Mensalidade atrasada?");
 
-  await banco
+  const { error: updateError } = await banco
     .from("registros")
     .update({
       nome: nome,
@@ -169,8 +198,13 @@ function novoAluno(){
     })
     .eq("id", id);
 
-  alert("Atualizado!");
+  if(updateError){
+    alert("Erro ao atualizar aluno");
+    console.error(updateError);
+    return;
+  }
 
+  alert("Atualizado!");
   carregarAlunos();
 }
 </script>
