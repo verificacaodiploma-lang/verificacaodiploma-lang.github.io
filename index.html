@@ -137,16 +137,41 @@ async function carregarAlunos(){
   let html = "";
 
   data.forEach(aluno => {
-    html += `<div style="padding:10px;border-bottom:1px solid #ddd;">
-      ${aluno.nome} - ${aluno.curso}
-    </div>`;
-  });
-
-  document.getElementById("alunos").innerHTML = html;
-}
+    html += `<div onclick="editarAluno(${aluno.id})" 
+style="padding:10px;border-bottom:1px solid #ddd;cursor:pointer;">
+  ${aluno.nome} - ${aluno.curso}
+</div>`;
 
 function novoAluno(){
   alert("Vamos criar o formulário no próximo passo 😄");
+}
+    async function editarAluno(id){
+  const { data } = await banco
+    .from("registros")
+    .select("*")
+    .eq("id", id)
+    .single();
+
+  const aluno = data;
+
+  const nome = prompt("Nome:", aluno.nome);
+  const curso = prompt("Curso:", aluno.curso);
+  const status = prompt("Status (Ativo/Concluído):", aluno.status);
+  const atrasado = confirm("Mensalidade atrasada?");
+
+  await banco
+    .from("registros")
+    .update({
+      nome: nome,
+      curso: curso,
+      status: status,
+      mensalidade_atrasada: atrasado
+    })
+    .eq("id", id);
+
+  alert("Atualizado!");
+
+  carregarAlunos();
 }
 </script>
 
