@@ -10,13 +10,14 @@
 <style>
 body{
   margin:0;
-  font-family:Arial;
+  font-family:Arial, sans-serif;
   background:#eef3f9;
 }
 
 .container{
   max-width:900px;
   margin:40px auto;
+  padding:20px;
 }
 
 .card{
@@ -24,6 +25,7 @@ body{
   padding:20px;
   border-radius:10px;
   margin-bottom:20px;
+  box-shadow:0 10px 24px rgba(0,0,0,.06);
 }
 
 .grid{
@@ -33,13 +35,54 @@ body{
 }
 
 .btn{
-  padding:20px;
+  padding:16px;
   background:#005daa;
   color:#fff;
   border:none;
   border-radius:8px;
   cursor:pointer;
   font-size:16px;
+  font-weight:bold;
+}
+
+.btn-sec{
+  padding:12px 16px;
+  background:#111827;
+  color:#fff;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+.item-aluno{
+  padding:12px;
+  border-bottom:1px solid #e5e7eb;
+  cursor:pointer;
+  border-radius:6px;
+}
+
+.item-aluno:hover{
+  background:#f8fafc;
+}
+
+.topo{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  flex-wrap:wrap;
+}
+
+#mensagem{
+  margin-top:10px;
+  color:#6b7280;
+}
+
+@media (max-width: 640px){
+  .grid{
+    grid-template-columns:1fr;
+  }
 }
 </style>
 </head>
@@ -50,34 +93,41 @@ body{
 
   <div id="loginBox" class="card">
     <h2>Login ADM</h2>
-    <input id="email" placeholder="Email"><br><br>
-    <input id="senha" type="password" placeholder="Senha"><br><br>
-    <button onclick="login()">Entrar</button>
+    <input id="email" type="email" placeholder="Email" style="width:100%;padding:12px;box-sizing:border-box;"><br><br>
+    <input id="senha" type="password" placeholder="Senha" style="width:100%;padding:12px;box-sizing:border-box;"><br><br>
+    <button class="btn" onclick="login()">Entrar</button>
+    <div id="mensagemLogin" style="margin-top:10px;color:#b91c1c;"></div>
   </div>
 
   <div id="painel" class="card" style="display:none;">
-    <h2>Universidades</h2>
-
-    <div class="grid">
-      <button class="btn" onclick="abrirUniversidade('estacio')">Estácio</button>
-      <button class="btn" onclick="abrirUniversidade('usp')">USP</button>
-      <button class="btn" onclick="abrirUniversidade('anhanguera')">Anhanguera</button>
+    <div class="topo">
+      <h2 style="margin:0;">Universidades</h2>
+      <button class="btn-sec" onclick="logout()">Sair</button>
     </div>
 
     <br>
-    <button onclick="logout()">Sair</button>
+
+    <div class="grid">
+      <button class="btn" onclick="abrirUniversidade('estacio', 'Estácio')">Estácio</button>
+      <button class="btn" onclick="abrirUniversidade('usp', 'USP')">USP</button>
+      <button class="btn" onclick="abrirUniversidade('anhanguera', 'Anhanguera')">Anhanguera</button>
+    </div>
   </div>
 
   <div id="listaAlunos" class="card" style="display:none;">
-    <h2 id="tituloUniversidade"></h2>
+    <div class="topo">
+      <h2 id="tituloUniversidade" style="margin:0;"></h2>
+      <button class="btn-sec" onclick="voltar()">⬅ Voltar</button>
+    </div>
 
-    <button onclick="voltar()">⬅ Voltar</button>
-    <br><br>
+    <br>
 
     <div id="alunos"></div>
 
     <br>
-    <button onclick="novoAluno()">+ Novo aluno</button>
+
+    <button class="btn" onclick="novoAluno()">+ Novo aluno</button>
+    <div id="mensagem"></div>
   </div>
 
 </div>
@@ -89,21 +139,24 @@ const banco = window.supabase.createClient(
 );
 
 let universidadeAtual = "";
+let universidadeNomeAtual = "";
 
 async function login(){
-  const email = document.getElementById("email").value;
+  const email = document.getElementById("email").value.trim();
   const senha = document.getElementById("senha").value;
+  const msg = document.getElementById("mensagemLogin");
 
   const { error } = await banco.auth.signInWithPassword({
-    email: email,
+    email,
     password: senha
   });
 
   if(error){
-    alert("Erro no login");
+    msg.textContent = "Erro no login: " + error.message;
     return;
   }
 
+  msg.textContent = "";
   document.getElementById("loginBox").style.display = "none";
   document.getElementById("painel").style.display = "block";
 }
@@ -113,12 +166,13 @@ async function logout(){
   location.reload();
 }
 
-async function abrirUniversidade(slug){
+async function abrirUniversidade(slug, nome){
   universidadeAtual = slug;
+  universidadeNomeAtual = nome;
 
   document.getElementById("painel").style.display = "none";
   document.getElementById("listaAlunos").style.display = "block";
-  document.getElementById("tituloUniversidade").innerText = slug.toUpperCase();
+  document.getElementById("tituloUniversidade").innerText = nome;
 
   carregarAlunos();
 }
@@ -126,16 +180,18 @@ async function abrirUniversidade(slug){
 function voltar(){
   document.getElementById("listaAlunos").style.display = "none";
   document.getElementById("painel").style.display = "block";
+  document.getElementById("mensagem").innerText = "";
 }
 
 async function carregarAlunos(){
   const { data, error } = await banco
     .from("registros")
     .select("*")
-    .eq("universidade_slug", universidadeAtual);
+    .eq("universidade_slug", universidadeAtual)
+    .order("nome", { ascending: true });
 
   if(error){
-    alert("Erro ao carregar alunos");
+    document.getElementById("mensagem").innerText = "Erro ao carregar alunos.";
     console.error(error);
     return;
   }
@@ -143,69 +199,28 @@ async function carregarAlunos(){
   let html = "";
 
   if(!data || data.length === 0){
-    html = "<div>Nenhum aluno cadastrado.</div>";
+    html = `<div class="item-aluno">Nenhum aluno cadastrado.</div>`;
   } else {
     data.forEach(aluno => {
       html += `
-        <div onclick="editarAluno(${aluno.id})"
-          style="padding:10px;border-bottom:1px solid #ddd;cursor:pointer;">
-          ${aluno.nome} - ${aluno.curso}
+        <div class="item-aluno" onclick="abrirAluno(${aluno.id})">
+          <strong>${aluno.nome || ""}</strong><br>
+          <span>${aluno.curso || ""}</span>
         </div>
       `;
     });
   }
 
   document.getElementById("alunos").innerHTML = html;
+  document.getElementById("mensagem").innerText = "";
+}
+
+function abrirAluno(id){
+  window.location.href = "aluno.html?id=" + id;
 }
 
 function novoAluno(){
-  alert("Vamos criar o formulário no próximo passo 😄");
-}
-
-async function editarAluno(id){
-  const { data, error } = await banco
-    .from("registros")
-    .select("*")
-    .eq("id", id)
-    .single();
-
-  if(error){
-    alert("Erro ao buscar aluno");
-    console.error(error);
-    return;
-  }
-
-  const aluno = data;
-
-  const nome = prompt("Nome:", aluno.nome || "");
-  if (nome === null) return;
-
-  const curso = prompt("Curso:", aluno.curso || "");
-  if (curso === null) return;
-
-  const status = prompt("Status (Ativo/Concluído):", aluno.status || "");
-  if (status === null) return;
-
-  const atrasado = confirm("Mensalidade atrasada?");
-
-  const { error: updateError } = await banco
-    .from("registros")
-    .update({
-      nome: nome,
-      curso: curso,
-      status: status,
-      mensalidade_atrasada: atrasado
-    })
-    .eq("id", id);
-
-  if(updateError){
-    alert("Erro ao atualizar aluno");
-    console.error(updateError);
-    return;
-  }
-
-  alert("Atualizado!");
-  carregarAlunos();
+  alert("A tela de novo aluno vamos criar no próximo turno.");
 }
 </script>
 
