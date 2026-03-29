@@ -1,69 +1,154 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Verificação de Diplomas</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<title>Painel ADM</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #eef3f9;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    .box {
-      background: white;
-      padding: 40px;
-      border-radius: 12px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-      text-align: center;
-    }
+<style>
+body{
+  margin:0;
+  font-family:Arial;
+  background:#eef3f9;
+}
 
-    h1 {
-      margin-bottom: 20px;
-      color: #111827;
-    }
+.container{
+  max-width:900px;
+  margin:40px auto;
+}
 
-    a {
-      display: block;
-      margin-top: 15px;
-      padding: 12px;
-      border-radius: 6px;
-      text-decoration: none;
-      font-weight: bold;
-    }
+.card{
+  background:#fff;
+  padding:20px;
+  border-radius:10px;
+}
 
-    .btn {
-      background: #2563eb;
-      color: white;
-    }
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:15px;
+}
 
-    .admin {
-      background: #111827;
-      color: white;
-      font-size: 13px;
-    }
-  </style>
+.btn{
+  padding:20px;
+  background:#005daa;
+  color:#fff;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+  font-size:16px;
+}
+</style>
 </head>
 
 <body>
 
-  <div class="box">
-    <h1>Verificação de Diplomas</h1>
+<div class="container">
 
-    <a class="btn" href="#">
-      Acessar Verificação
-    </a>
+<div id="loginBox" class="card">
+  <h2>Login ADM</h2>
+  <input id="email" placeholder="Email"><br><br>
+  <input id="senha" type="password" placeholder="Senha"><br><br>
+  <button onclick="login()">Entrar</button>
+</div>
 
-    <a class="admin" href="admin.html">
-      Área Administrativa
-    </a>
+<div id="painel" class="card" style="display:none;">
+  <h2>Universidades</h2>
+
+  <div class="grid">
+    <button class="btn" onclick="abrirUniversidade('estacio')">Estácio</button>
+    <button class="btn" onclick="abrirUniversidade('usp')">USP</button>
+    <button class="btn" onclick="abrirUniversidade('anhanguera')">Anhanguera</button>
   </div>
+
+  <br>
+  <button onclick="logout()">Sair</button>
+</div>
+
+<div id="listaAlunos" class="card" style="display:none;">
+  <h2 id="tituloUniversidade"></h2>
+
+  <button onclick="voltar()">⬅ Voltar</button>
+  <br><br>
+
+  <div id="alunos"></div>
+
+  <br>
+  <button onclick="novoAluno()">+ Novo aluno</button>
+</div>
+
+</div>
+
+<script>
+const banco = window.supabase.createClient(
+  "https://fghkqwxhrdodyhvfrlzz.supabase.co",
+  "sb_publishable_cwIQcgCl1O0z_CKo6E8xUQ_Y-VoPyve"
+);
+
+let universidadeAtual = "";
+
+async function login(){
+  const email = document.getElementById("email").value;
+  const senha = document.getElementById("senha").value;
+
+  const { error } = await banco.auth.signInWithPassword({
+    email: email,
+    password: senha
+  });
+
+  if(error){
+    alert("Erro no login");
+    return;
+  }
+
+  document.getElementById("loginBox").style.display="none";
+  document.getElementById("painel").style.display="block";
+}
+
+async function logout(){
+  await banco.auth.signOut();
+  location.reload();
+}
+
+async function abrirUniversidade(slug){
+  universidadeAtual = slug;
+
+  document.getElementById("painel").style.display="none";
+  document.getElementById("listaAlunos").style.display="block";
+
+  document.getElementById("tituloUniversidade").innerText = slug.toUpperCase();
+
+  carregarAlunos();
+}
+
+function voltar(){
+  document.getElementById("listaAlunos").style.display="none";
+  document.getElementById("painel").style.display="block";
+}
+
+async function carregarAlunos(){
+  const { data } = await banco
+    .from("registros")
+    .select("*")
+    .eq("universidade_slug", universidadeAtual);
+
+  let html = "";
+
+  data.forEach(aluno => {
+    html += `<div style="padding:10px;border-bottom:1px solid #ddd;">
+      ${aluno.nome} - ${aluno.curso}
+    </div>`;
+  });
+
+  document.getElementById("alunos").innerHTML = html;
+}
+
+function novoAluno(){
+  alert("Vamos criar o formulário no próximo passo 😄");
+}
+</script>
 
 </body>
 </html>
