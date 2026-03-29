@@ -202,12 +202,22 @@ async function carregarAlunos(){
     html = `<div class="item-aluno">Nenhum aluno cadastrado.</div>`;
   } else {
     data.forEach(aluno => {
-      html += `
-        <div class="item-aluno" onclick="abrirAluno(${aluno.id})">
-          <strong>${aluno.nome || ""}</strong><br>
-          <span>${aluno.curso || ""}</span>
-        </div>
-      `;
+     const statusCor = (aluno.status || "").toLowerCase() === "ativo" ? "green" : "blue";
+
+const atrasado = aluno.mensalidade_atrasada
+  ? `<span style="color:red;font-size:12px;">🔴 Mensalidade atrasada</span>`
+  : `<span style="color:green;font-size:12px;">🟢 Em dia</span>`;
+
+html += `
+  <div class="item-aluno" onclick="abrirAluno(${aluno.id})">
+    <strong>${aluno.nome || ""}</strong><br>
+    <span>${aluno.curso || ""}</span><br>
+    <span style="color:${statusCor};font-size:12px;">
+      ● ${aluno.status || ""}
+    </span><br>
+    ${atrasado}
+  </div>
+`;
     });
   }
 
