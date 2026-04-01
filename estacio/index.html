@@ -1,252 +1,662 @@
 <!doctype html>
 <html lang="pt-BR">
-
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Portal Acadêmico — Estácio</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Estácio | Verificação de Registro Acadêmico</title>
 
-<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-<style>
-:root {
-  --primary: #005daa;
-  --bg: #f4f6fb;
-  --card: #ffffff;
-  --text: #0f172a;
-  --muted: #6b7280;
-  --border: #e5e7eb;
-  --success: #16a34a;
-}
+  <style>
+    :root{
+      --primary:#0b63ce;
+      --primary-dark:#084ea4;
+      --accent:#ff4d4f;
+      --bg:#f4f7fb;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#64748b;
+      --border:#dbe4f0;
+      --success:#16a34a;
+      --success-bg:#ecfdf5;
+      --danger:#dc2626;
+      --danger-bg:#fef2f2;
+      --shadow:0 18px 40px rgba(15,23,42,.10);
+      --radius:18px;
+    }
 
-body {
-  margin: 0;
-  font-family: system-ui, Arial;
-  background: var(--bg);
-  color: var(--text);
-}
+    *{
+      box-sizing:border-box;
+    }
 
-.topbar {
-  background: #111827;
-  color: #fff;
-  font-size: 13px;
-  padding: 6px 20px;
-}
+    body{
+      margin:0;
+      font-family:Arial, sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
 
-header {
-  background: #fff;
-  border-bottom: 1px solid var(--border);
-}
+    .topbar{
+      background:#ffffff;
+      border-bottom:1px solid #e5e7eb;
+      position:sticky;
+      top:0;
+      z-index:20;
+    }
 
-.header-inner {
-  max-width: 1100px;
-  margin: auto;
-  padding: 18px 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
+    .topbar-inner{
+      max-width:1200px;
+      margin:0 auto;
+      padding:16px 20px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+    }
 
-.logo {
-  font-size: 22px;
-  font-weight: 800;
-  color: var(--primary);
-}
+    .logo-wrap{
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
 
-.banner {
-  background: linear-gradient(90deg, #005daa, #003f73);
-  color: #fff;
-  padding: 40px 20px;
-  text-align: center;
-}
+    .logo-badge{
+      width:18px;
+      height:18px;
+      transform:rotate(45deg);
+      background:linear-gradient(135deg,#8de0cf,#59b1e6);
+      border-radius:3px;
+      position:relative;
+    }
 
-.container {
-  max-width: 900px;
-  margin: 40px auto;
-  padding: 20px;
-}
+    .logo-badge::after{
+      content:"";
+      position:absolute;
+      inset:4px;
+      border:2px solid rgba(255,255,255,.9);
+      border-radius:2px;
+    }
 
-.panel {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-}
+    .logo-text{
+      font-size:34px;
+      font-weight:400;
+      color:#5b513f;
+      line-height:1;
+    }
 
-.panel-header {
-  background: var(--primary);
-  color: #fff;
-  padding: 16px;
-  font-weight: 600;
-}
+    .top-btn{
+      background:var(--accent);
+      color:#fff;
+      border:none;
+      padding:12px 20px;
+      border-radius:10px;
+      font-weight:700;
+      cursor:pointer;
+      box-shadow:0 10px 20px rgba(255,77,79,.25);
+    }
 
-.panel-body {
-  padding: 20px;
-}
+    .hero{
+      background:
+        radial-gradient(circle at 18% 25%, rgba(255,255,255,.18), transparent 28%),
+        radial-gradient(circle at 85% 15%, rgba(255,255,255,.12), transparent 22%),
+        linear-gradient(100deg, #0a74d6 0%, #0b63ce 38%, #0b56b1 100%);
+      min-height:430px;
+      display:flex;
+      align-items:center;
+      overflow:hidden;
+    }
 
-.search {
-  display: flex;
-  gap: 10px;
-}
+    .hero-inner{
+      max-width:1200px;
+      margin:0 auto;
+      padding:48px 20px;
+      width:100%;
+      display:grid;
+      grid-template-columns:1.15fr .85fr;
+      gap:28px;
+      align-items:center;
+    }
 
-input {
-  flex: 1;
-  padding: 12px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-}
+    .hero-text h1{
+      margin:0 0 18px 0;
+      color:#fff;
+      font-size:56px;
+      line-height:1.02;
+      letter-spacing:-1px;
+      max-width:620px;
+    }
 
-button {
-  background: var(--primary);
-  color: #fff;
-  border: none;
-  padding: 12px 16px;
-  border-radius: 6px;
-  cursor: pointer;
-}
+    .hero-text p{
+      margin:0;
+      color:rgba(255,255,255,.92);
+      font-size:20px;
+      line-height:1.5;
+      max-width:560px;
+    }
 
-.loader {
-  display: none;
-  margin-top: 15px;
-}
+    .hero-card{
+      background:rgba(255,255,255,.14);
+      border:1px solid rgba(255,255,255,.18);
+      backdrop-filter:blur(8px);
+      border-radius:28px;
+      padding:26px;
+      color:#fff;
+      box-shadow:0 18px 40px rgba(0,0,0,.12);
+    }
 
-.status {
-  background: #ecfdf5;
-  color: var(--success);
-  padding: 6px 12px;
-  border-radius: 999px;
-  font-weight: bold;
-  margin-bottom: 16px;
-}
+    .hero-card .mini{
+      font-size:15px;
+      opacity:.9;
+      margin-bottom:10px;
+    }
 
-.field {
-  display: grid;
-  grid-template-columns: 200px 1fr;
-  padding: 10px 0;
-  border-bottom: 1px solid #f1f5f9;
-}
+    .hero-card .big{
+      font-size:38px;
+      font-weight:800;
+      line-height:1.05;
+      margin-bottom:12px;
+    }
 
-.label {
-  color: var(--muted);
-}
+    .hero-card .pill{
+      display:inline-block;
+      background:#ffde59;
+      color:#1f2937;
+      font-weight:800;
+      border-radius:999px;
+      padding:10px 16px;
+      margin-top:8px;
+      font-size:15px;
+    }
 
-.value {
-  font-weight: 600;
-}
-</style>
+    .main-wrap{
+      max-width:1200px;
+      margin:-70px auto 40px;
+      padding:0 20px;
+      position:relative;
+      z-index:2;
+    }
+
+    .consulta-card{
+      background:var(--card);
+      border-radius:24px;
+      box-shadow:var(--shadow);
+      overflow:hidden;
+      border:1px solid #eaf0f7;
+    }
+
+    .consulta-header{
+      background:linear-gradient(90deg,var(--primary),var(--primary-dark));
+      color:#fff;
+      padding:22px 26px;
+    }
+
+    .consulta-header h2{
+      margin:0;
+      font-size:26px;
+    }
+
+    .consulta-header p{
+      margin:8px 0 0;
+      color:rgba(255,255,255,.88);
+      font-size:15px;
+    }
+
+    .consulta-body{
+      padding:26px;
+    }
+
+    .search{
+      display:grid;
+      grid-template-columns:1fr auto;
+      gap:12px;
+      align-items:center;
+    }
+
+    .search input{
+      width:100%;
+      padding:16px 18px;
+      border:1px solid var(--border);
+      border-radius:14px;
+      font-size:16px;
+      outline:none;
+      transition:.2s ease;
+      background:#fff;
+    }
+
+    .search input:focus{
+      border-color:#8ab6f3;
+      box-shadow:0 0 0 4px rgba(11,99,206,.10);
+    }
+
+    .search button{
+      background:linear-gradient(90deg,var(--primary),var(--primary-dark));
+      color:#fff;
+      border:none;
+      padding:16px 22px;
+      border-radius:14px;
+      font-size:16px;
+      font-weight:700;
+      cursor:pointer;
+      min-width:150px;
+    }
+
+    .helper{
+      margin-top:12px;
+      color:var(--muted);
+      font-size:14px;
+    }
+
+    .loader{
+      display:none;
+      margin-top:18px;
+      color:var(--primary);
+      font-weight:700;
+      font-size:15px;
+    }
+
+    .resultado{
+      display:none;
+      margin-top:26px;
+      padding:22px;
+      border:1px solid #e6edf6;
+      background:#fbfdff;
+      border-radius:18px;
+    }
+
+    .status{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 14px;
+      border-radius:999px;
+      font-weight:800;
+      font-size:14px;
+      margin-bottom:18px;
+    }
+
+    .status.ok{
+      background:var(--success-bg);
+      color:var(--success);
+      border:1px solid #bbf7d0;
+    }
+
+    .status.warn{
+      background:var(--danger-bg);
+      color:var(--danger);
+      border:1px solid #fecaca;
+    }
+
+    .grid-info{
+      display:grid;
+      grid-template-columns:1fr 220px;
+      gap:24px;
+      align-items:start;
+    }
+
+    .field{
+      display:grid;
+      grid-template-columns:180px 1fr;
+      gap:12px;
+      padding:12px 0;
+      border-bottom:1px solid #eef3f8;
+    }
+
+    .field:last-child{
+      border-bottom:none;
+    }
+
+    .label{
+      color:var(--muted);
+      font-weight:700;
+    }
+
+    .value{
+      font-weight:700;
+      word-break:break-word;
+    }
+
+    .qr-box{
+      background:#fff;
+      border:1px solid #e6edf6;
+      border-radius:16px;
+      padding:16px;
+      text-align:center;
+    }
+
+    .qr-box h3{
+      margin:0 0 12px;
+      font-size:15px;
+      color:#334155;
+    }
+
+    #qrcode{
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      min-height:132px;
+    }
+
+    .actions{
+      margin-top:20px;
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    .btn-light{
+      background:#fff;
+      border:1px solid #dbe4f0;
+      color:#0f172a;
+      padding:12px 18px;
+      border-radius:12px;
+      font-weight:700;
+      cursor:pointer;
+    }
+
+    .footer-note{
+      max-width:1200px;
+      margin:0 auto 36px;
+      padding:0 20px;
+      color:#64748b;
+      font-size:14px;
+      text-align:center;
+    }
+
+    @media (max-width: 920px){
+      .hero-inner{
+        grid-template-columns:1fr;
+      }
+
+      .hero-text h1{
+        font-size:42px;
+      }
+
+      .main-wrap{
+        margin:-35px auto 30px;
+      }
+
+      .grid-info{
+        grid-template-columns:1fr;
+      }
+    }
+
+    @media (max-width: 640px){
+      .topbar-inner{
+        padding:14px 16px;
+      }
+
+      .logo-text{
+        font-size:28px;
+      }
+
+      .top-btn{
+        padding:10px 14px;
+        font-size:13px;
+      }
+
+      .hero{
+        min-height:auto;
+      }
+
+      .hero-inner{
+        padding:28px 16px 50px;
+      }
+
+      .hero-text h1{
+        font-size:34px;
+      }
+
+      .hero-text p{
+        font-size:16px;
+      }
+
+      .hero-card{
+        padding:20px;
+        border-radius:20px;
+      }
+
+      .hero-card .big{
+        font-size:30px;
+      }
+
+      .main-wrap{
+        padding:0 16px;
+      }
+
+      .consulta-header,
+      .consulta-body{
+        padding:18px;
+      }
+
+      .search{
+        grid-template-columns:1fr;
+      }
+
+      .search button{
+        width:100%;
+      }
+
+      .field{
+        grid-template-columns:1fr;
+        gap:6px;
+      }
+    }
+
+    @media print{
+      .topbar,
+      .hero,
+      .search,
+      .loader,
+      .actions,
+      .helper{
+        display:none !important;
+      }
+
+      body{
+        background:#fff;
+      }
+
+      .main-wrap{
+        margin:0;
+        max-width:none;
+        padding:0;
+      }
+
+      .consulta-card{
+        box-shadow:none;
+        border:none;
+      }
+
+      .resultado{
+        display:block !important;
+        border:none;
+        background:#fff;
+        padding:0;
+      }
+
+      .grid-info{
+        grid-template-columns:1fr;
+      }
+    }
+  </style>
 </head>
 
 <body>
 
-<div class="topbar">Portal Acadêmico Estácio</div>
-
-<header>
-  <div class="header-inner">
-    <div class="logo">ESTÁCIO</div>
-  </div>
-</header>
-
-<div class="banner">
-  <h2>Verificação de Diploma</h2>
-  <p>Consulte a autenticidade do registro acadêmico</p>
-</div>
-
-<div class="container">
-  <div class="panel">
-    <div class="panel-header">Consulta de Diploma</div>
-
-    <div class="panel-body">
-
-      <div class="search">
-        <input id="q" placeholder="Digite o número do registro" />
-        <button id="btn">Consultar</button>
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div class="logo-wrap">
+        <div class="logo-badge"></div>
+        <div class="logo-text">Estácio</div>
       </div>
-
-      <div id="loader" class="loader">Consultando base acadêmica...</div>
-
-      <div id="resultado" style="display:none; margin-top:20px;">
-
-        <div class="status">● Registro válido</div>
-
-        <div class="field"><div class="label">Nome</div><div class="value" id="name"></div></div>
-        <div class="field"><div class="label">Curso</div><div class="value" id="degree"></div></div>
-        <div class="field"><div class="label">Instituição</div><div class="value" id="inst"></div></div>
-        <div class="field"><div class="label">Polo</div><div class="value" id="polo"></div></div>
-        <div class="field"><div class="label">Conclusão</div><div class="value" id="date"></div></div>
-        <div class="field"><div class="label">Registro</div><div class="value" id="dnum"></div></div>
-        <div class="field"><div class="label">Protocolo</div><div class="value" id="protocol"></div></div>
-        <div class="field"><div class="label">Data da Consulta</div><div class="value" id="datetime"></div></div>
-
-        <div id="qrcode"></div>
-
-        <br>
-        <button onclick="window.print()">Imprimir</button>
-
-      </div>
-
+      <button class="top-btn" type="button">Inscreva-se</button>
     </div>
   </div>
-</div>
 
-<script>
-const banco = window.supabase.createClient(
-  "https://fghkqwxhrdodyhvfrlzz.supabase.co",
-  "sb_publishable_cwIQcgCl1O0z_CKo6E8xUQ_Y-VoPyve"
-);
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="hero-text">
+        <h1>Consulta de Registro Acadêmico com segurança e praticidade</h1>
+        <p>
+          Verifique a autenticidade de diplomas e registros emitidos pela instituição.
+          Consulte os dados do aluno de forma rápida, digital e confiável.
+        </p>
+      </div>
 
-function gerarProtocolo(){
-  return "EST-" + Math.random().toString(36).substring(2,8).toUpperCase();
-}
+      <div class="hero-card">
+        <div class="mini">Portal acadêmico digital</div>
+        <div class="big">Validação oficial de registros e diplomas</div>
+        <div>
+          Consulte o número do registro e visualize as informações acadêmicas
+          cadastradas no sistema.
+        </div>
+        <div class="pill">Consulta pública Estácio</div>
+      </div>
+    </div>
+  </section>
 
-document.getElementById('btn').addEventListener('click', async () => {
+  <div class="main-wrap">
+    <div class="consulta-card">
+      <div class="consulta-header">
+        <h2>Consultar diploma</h2>
+        <p>Digite o número do registro acadêmico para validar o documento.</p>
+      </div>
 
-  const q = document.getElementById('q').value.trim();
+      <div class="consulta-body">
+        <div class="search">
+          <input id="q" placeholder="Digite o número do registro" />
+          <button id="btn" type="button">Consultar</button>
+        </div>
 
-  const loader = document.getElementById('loader');
-  const resultado = document.getElementById('resultado');
+        <div class="helper">
+          Exemplo: informe o registro exatamente como cadastrado pela instituição.
+        </div>
 
-  resultado.style.display = 'none';
-  loader.style.display = 'block';
+        <div id="loader" class="loader">Consultando base acadêmica...</div>
 
-  const { data, error } = await banco
-    .from("registros")
-    .select("*")
-    .eq("registro", q)
-    .eq("universidade_slug", "estacio")
-    .single();
+        <div id="resultado" class="resultado">
+          <div id="status" class="status ok">● Registro válido</div>
 
-  setTimeout(() => {
-    loader.style.display = 'none';
+          <div class="grid-info">
+            <div>
+              <div class="field"><div class="label">Nome</div><div class="value" id="name"></div></div>
+              <div class="field"><div class="label">Curso</div><div class="value" id="degree"></div></div>
+              <div class="field"><div class="label">Instituição</div><div class="value" id="inst"></div></div>
+              <div class="field"><div class="label">Polo</div><div class="value" id="polo"></div></div>
+              <div class="field"><div class="label">Conclusão</div><div class="value" id="date"></div></div>
+              <div class="field"><div class="label">Registro</div><div class="value" id="dnum"></div></div>
+              <div class="field"><div class="label">Protocolo</div><div class="value" id="protocol"></div></div>
+              <div class="field"><div class="label">Data da consulta</div><div class="value" id="datetime"></div></div>
+            </div>
 
-    if(error || !data){
-      alert("Registro não encontrado.");
-      return;
+            <div class="qr-box">
+              <h3>Autenticidade digital</h3>
+              <div id="qrcode"></div>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button class="btn-light" onclick="window.print()" type="button">Imprimir</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    Consulta pública vinculada ao sistema acadêmico institucional.
+  </div>
+
+  <script>
+    const banco = window.supabase.createClient(
+      "https://fghkqwxhrdodyhvfrlzz.supabase.co",
+      "sb_publishable_cwIQcgCl1O0z_CKo6E8xUQ_Y-VoPyve"
+    );
+
+    function gerarProtocolo(){
+      return "EST-" + Math.random().toString(36).substring(2, 8).toUpperCase();
     }
 
-    const protocolo = gerarProtocolo();
-    const agora = new Date().toLocaleString("pt-BR");
+    function normalizarRegistro(valor){
+      return String(valor || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-zA-Z0-9]/g, "")
+        .toUpperCase()
+        .trim();
+    }
 
-    document.getElementById("name").innerText = data.nome || "";
-    document.getElementById("degree").innerText = data.curso || "";
-    document.getElementById("inst").innerText = data.universidade || "Estácio";
-    document.getElementById("polo").innerText = data.polo || "";
-    document.getElementById("date").innerText = data.conclusao || "";
-    document.getElementById("dnum").innerText = data.registro || "";
-    document.getElementById("protocol").innerText = protocolo;
-    document.getElementById("datetime").innerText = agora;
+    document.getElementById("btn").addEventListener("click", async () => {
+      const q = document.getElementById("q").value.trim();
+      const qNormalizado = normalizarRegistro(q);
 
-    document.getElementById("qrcode").innerHTML = "";
-    new QRCode(document.getElementById("qrcode"), {
-      text: protocolo,
-      width: 120,
-      height: 120
+      const loader = document.getElementById("loader");
+      const resultado = document.getElementById("resultado");
+
+      if(!q){
+        alert("Digite o número do registro.");
+        return;
+      }
+
+      resultado.style.display = "none";
+      loader.style.display = "block";
+
+      const { data, error } = await banco
+        .from("registros")
+        .select("*")
+        .eq("universidade_slug", "estacio");
+
+      setTimeout(() => {
+        loader.style.display = "none";
+
+        if(error || !data){
+          alert("Erro ao consultar registro.");
+          console.error(error);
+          return;
+        }
+
+        const encontrado = (data || []).find(item =>
+          normalizarRegistro(item.registro) === qNormalizado
+        );
+
+        if(!encontrado){
+          alert("Registro não encontrado.");
+          return;
+        }
+
+        const protocolo = gerarProtocolo();
+        const agora = new Date().toLocaleString("pt-BR");
+
+        document.getElementById("name").innerText = encontrado.nome || "";
+        document.getElementById("degree").innerText = encontrado.curso || "";
+        document.getElementById("inst").innerText = encontrado.universidade || "Estácio";
+        document.getElementById("polo").innerText = encontrado.polo || "";
+        document.getElementById("date").innerText = encontrado.conclusao || "";
+        document.getElementById("dnum").innerText = encontrado.registro || "";
+        document.getElementById("protocol").innerText = protocolo;
+        document.getElementById("datetime").innerText = agora;
+
+        const statusEl = document.getElementById("status");
+        if((encontrado.status || "").toLowerCase() === "ativo"){
+          statusEl.className = "status ok";
+          statusEl.innerText = "● Registro ativo";
+        } else {
+          statusEl.className = "status warn";
+          statusEl.innerText = "● Registro concluído";
+        }
+
+        document.getElementById("qrcode").innerHTML = "";
+        new QRCode(document.getElementById("qrcode"), {
+          text: protocolo,
+          width: 120,
+          height: 120
+        });
+
+        resultado.style.display = "block";
+      }, 700);
     });
-
-    resultado.style.display = "block";
-
-  }, 800);
-});
-</script>
+  </script>
 
 </body>
 </html>
