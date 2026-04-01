@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Portal Acadêmico — Estácio</title>
+
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+:root {
+  --primary: #005daa;
+  --bg: #f4f6fb;
+  --card: #ffffff;
+  --text: #0f172a;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+  --success: #16a34a;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, Arial;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.topbar {
+  background: #111827;
+  color: #fff;
+  font-size: 13px;
+  padding: 6px 20px;
+}
+
+header {
+  background: #fff;
+  border-bottom: 1px solid var(--border);
+}
+
+.header-inner {
+  max-width: 1100px;
+  margin: auto;
+  padding: 18px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--primary);
+}
+
+.banner {
+  background: linear-gradient(90deg, #005daa, #003f73);
+  color: #fff;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.container {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 20px;
+}
+
+.panel {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.panel-header {
+  background: var(--primary);
+  color: #fff;
+  padding: 16px;
+  font-weight: 600;
+}
+
+.panel-body {
+  padding: 20px;
+}
+
+.search {
+  display: flex;
+  gap: 10px;
+}
+
+input {
+  flex: 1;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+button {
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  padding: 12px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.loader {
+  display: none;
+  margin-top: 15px;
+}
+
+.status {
+  background: #ecfdf5;
+  color: var(--success);
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-weight: bold;
+  margin-bottom: 16px;
+}
+
+.field {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  padding: 10px 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.label {
+  color: var(--muted);
+}
+
+.value {
+  font-weight: 600;
+}
+</style>
+</head>
+
+<body>
+
+<div class="topbar">Portal Acadêmico Estácio</div>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">ESTÁCIO</div>
+  </div>
+</header>
+
+<div class="banner">
+  <h2>Verificação de Diploma</h2>
+  <p>Consulte a autenticidade do registro acadêmico</p>
+</div>
+
+<div class="container">
+  <div class="panel">
+    <div class="panel-header">Consulta de Diploma</div>
+
+    <div class="panel-body">
+
+      <div class="search">
+        <input id="q" placeholder="Digite o número do registro" />
+        <button id="btn">Consultar</button>
+      </div>
+
+      <div id="loader" class="loader">Consultando base acadêmica...</div>
+
+      <div id="resultado" style="display:none; margin-top:20px;">
+
+        <div class="status">● Registro válido</div>
+
+        <div class="field"><div class="label">Nome</div><div class="value" id="name"></div></div>
+        <div class="field"><div class="label">Curso</div><div class="value" id="degree"></div></div>
+        <div class="field"><div class="label">Instituição</div><div class="value" id="inst"></div></div>
+        <div class="field"><div class="label">Polo</div><div class="value" id="polo"></div></div>
+        <div class="field"><div class="label">Conclusão</div><div class="value" id="date"></div></div>
+        <div class="field"><div class="label">Registro</div><div class="value" id="dnum"></div></div>
+        <div class="field"><div class="label">Protocolo</div><div class="value" id="protocol"></div></div>
+        <div class="field"><div class="label">Data da Consulta</div><div class="value" id="datetime"></div></div>
+
+        <div id="qrcode"></div>
+
+        <br>
+        <button onclick="window.print()">Imprimir</button>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+const banco = window.supabase.createClient(
+  "https://fghkqwxhrdodyhvfrlzz.supabase.co",
+  "sb_publishable_cwIQcgCl1O0z_CKo6E8xUQ_Y-VoPyve"
+);
+
+function gerarProtocolo(){
+  return "EST-" + Math.random().toString(36).substring(2,8).toUpperCase();
+}
+
+document.getElementById('btn').addEventListener('click', async () => {
+
+  const q = document.getElementById('q').value.trim();
+
+  const loader = document.getElementById('loader');
+  const resultado = document.getElementById('resultado');
+
+  resultado.style.display = 'none';
+  loader.style.display = 'block';
+
+  const { data, error } = await banco
+    .from("registros")
+    .select("*")
+    .eq("registro", q)
+    .eq("universidade_slug", "estacio")
+    .single();
+
+  setTimeout(() => {
+    loader.style.display = 'none';
+
+    if(error || !data){
+      alert("Registro não encontrado.");
+      return;
+    }
+
+    const protocolo = gerarProtocolo();
+    const agora = new Date().toLocaleString("pt-BR");
+
+    document.getElementById("name").innerText = data.nome || "";
+    document.getElementById("degree").innerText = data.curso || "";
+    document.getElementById("inst").innerText = data.universidade || "Estácio";
+    document.getElementById("polo").innerText = data.polo || "";
+    document.getElementById("date").innerText = data.conclusao || "";
+    document.getElementById("dnum").innerText = data.registro || "";
+    document.getElementById("protocol").innerText = protocolo;
+    document.getElementById("datetime").innerText = agora;
+
+    document.getElementById("qrcode").innerHTML = "";
+    new QRCode(document.getElementById("qrcode"), {
+      text: protocolo,
+      width: 120,
+      height: 120
+    });
+
+    resultado.style.display = "block";
+
+  }, 800);
+});
+</script>
+
+</body>
+</html>
