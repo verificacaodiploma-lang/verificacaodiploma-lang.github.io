@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Ficha do Aluno</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+body{
+  margin:0;
+  font-family:Arial;
+  background:#eef3f9;
+}
+
+.container{
+  max-width:700px;
+  margin:40px auto;
+  padding:20px;
+}
+
+.card{
+  background:#fff;
+  padding:20px;
+  border-radius:10px;
+}
+
+input, select, textarea{
+  width:100%;
+  padding:12px;
+  margin-bottom:12px;
+  border:1px solid #ddd;
+  border-radius:6px;
+}
+
+button{
+  padding:12px;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+.salvar{
+  background:#005daa;
+  color:#fff;
+}
+
+.voltar{
+  background:#111827;
+  color:#fff;
+  margin-bottom:10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <button class="voltar" onclick="voltar()">⬅ Voltar</button>
+
+  <div class="card">
+    <h2>Ficha do Aluno</h2>
+
+    <input id="nome" placeholder="Nome">
+    <input id="curso" placeholder="Curso">
+    <input id="registro" placeholder="Registro">
+
+    <select id="status">
+      <option value="Ativo">Ativo</option>
+      <option value="Concluído">Concluído</option>
+    </select>
+
+    <label>
+      <input type="checkbox" id="mensalidade">
+      Mensalidade atrasada
+    </label>
+
+    <textarea id="obs" placeholder="Observações"></textarea>
+
+    <button class="salvar" onclick="salvar()">Salvar alterações</button>
+
+    <div id="msg"></div>
+  </div>
+
+</div>
+
+<script>
+const banco = window.supabase.createClient(
+  "https://fghkqwxhrdodyhvfrlzz.supabase.co",
+  "sb_publishable_cwIQcgCl1O0z_CKo6E8xUQ_Y-VoPyve"
+);
+
+const urlParams = new URLSearchParams(window.location.search);
+const id = urlParams.get("id");
+
+async function carregarAluno(){
+  const { data, error } = await banco
+    .from("registros")
+    .select("*")
+    .eq("id", id)
+    .single();
+
+  if(error){
+    alert("Erro ao carregar aluno");
+    return;
+  }
+
+  document.getElementById("nome").value = data.nome || "";
+  document.getElementById("curso").value = data.curso || "";
+  document.getElementById("registro").value = data.registro || "";
+  document.getElementById("status").value = data.status || "Ativo";
+  document.getElementById("mensalidade").checked = data.mensalidade_atrasada || false;
+  document.getElementById("obs").value = data.observacoes || "";
+}
+
+async function salvar(){
+  const { error } = await banco
+    .from("registros")
+    .update({
+      nome: document.getElementById("nome").value,
+      curso: document.getElementById("curso").value,
+      registro: document.getElementById("registro").value,
+      status: document.getElementById("status").value,
+      mensalidade_atrasada: document.getElementById("mensalidade").checked,
+      observacoes: document.getElementById("obs").value
+    })
+    .eq("id", id);
+
+  if(error){
+    document.getElementById("msg").innerText = "Erro ao salvar";
+    return;
+  }
+
+  document.getElementById("msg").innerText = "Salvo com sucesso!";
+}
+
+function voltar(){
+  history.back();
+}
+
+carregarAluno();
+</script>
+
+</body>
+</html>
