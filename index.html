@@ -79,6 +79,18 @@ body{
   color:#6b7280;
 }
 
+#mensagemLogin{
+  margin-top:10px;
+  color:#b91c1c;
+}
+
+.badge{
+  display:inline-block;
+  font-size:12px;
+  font-weight:bold;
+  margin-top:6px;
+}
+
 @media (max-width: 640px){
   .grid{
     grid-template-columns:1fr;
@@ -93,10 +105,26 @@ body{
 
   <div id="loginBox" class="card">
     <h2>Login ADM</h2>
-    <input id="email" type="email" placeholder="Email" style="width:100%;padding:12px;box-sizing:border-box;"><br><br>
-    <input id="senha" type="password" placeholder="Senha" style="width:100%;padding:12px;box-sizing:border-box;"><br><br>
+
+    <input
+      id="email"
+      type="email"
+      placeholder="Email"
+      style="width:100%;padding:12px;box-sizing:border-box;"
+    >
+    <br><br>
+
+    <input
+      id="senha"
+      type="password"
+      placeholder="Senha"
+      style="width:100%;padding:12px;box-sizing:border-box;"
+    >
+    <br><br>
+
     <button class="btn" onclick="login()">Entrar</button>
-    <div id="mensagemLogin" style="margin-top:10px;color:#b91c1c;"></div>
+
+    <div id="mensagemLogin"></div>
   </div>
 
   <div id="painel" class="card" style="display:none;">
@@ -127,6 +155,7 @@ body{
     <br>
 
     <button class="btn" onclick="novoAluno()">+ Novo aluno</button>
+
     <div id="mensagem"></div>
   </div>
 
@@ -140,6 +169,25 @@ const banco = window.supabase.createClient(
 
 let universidadeAtual = "";
 let universidadeNomeAtual = "";
+
+// Verifica automaticamente se já existe sessão ativa
+async function verificarSessao(){
+  const { data, error } = await banco.auth.getSession();
+
+  if(error){
+    console.error("Erro ao verificar sessão:", error);
+    return;
+  }
+
+  if(data.session){
+    document.getElementById("loginBox").style.display = "none";
+    document.getElementById("painel").style.display = "block";
+  } else {
+    document.getElementById("loginBox").style.display = "block";
+    document.getElementById("painel").style.display = "none";
+    document.getElementById("listaAlunos").style.display = "none";
+  }
+}
 
 async function login(){
   const email = document.getElementById("email").value.trim();
@@ -202,22 +250,21 @@ async function carregarAlunos(){
     html = `<div class="item-aluno">Nenhum aluno cadastrado.</div>`;
   } else {
     data.forEach(aluno => {
-     const statusCor = (aluno.status || "").toLowerCase() === "ativo" ? "green" : "blue";
+      const status = aluno.status || "Sem status";
+      const statusCor = status.toLowerCase() === "ativo" ? "green" : "blue";
 
-const atrasado = aluno.mensalidade_atrasada
-  ? `<span style="color:red;font-size:12px;">🔴 Mensalidade atrasada</span>`
-  : `<span style="color:green;font-size:12px;">🟢 Em dia</span>`;
+      const mensalidade = aluno.mensalidade_atrasada
+        ? `<span class="badge" style="color:red;">🔴 Mensalidade atrasada</span>`
+        : `<span class="badge" style="color:green;">🟢 Em dia</span>`;
 
-html += `
-  <div class="item-aluno" onclick="abrirAluno(${aluno.id})">
-    <strong>${aluno.nome || ""}</strong><br>
-    <span>${aluno.curso || ""}</span><br>
-    <span style="color:${statusCor};font-size:12px;">
-      ● ${aluno.status || ""}
-    </span><br>
-    ${atrasado}
-  </div>
-`;
+      html += `
+        <div class="item-aluno" onclick="abrirAluno(${aluno.id})">
+          <strong>${aluno.nome || ""}</strong><br>
+          <span>${aluno.curso || ""}</span><br>
+          <span class="badge" style="color:${statusCor};">● ${status}</span><br>
+          ${mensalidade}
+        </div>
+      `;
     });
   }
 
@@ -230,8 +277,11 @@ function abrirAluno(id){
 }
 
 function novoAluno(){
-  alert("A tela de novo aluno vamos criar no próximo turno.");
+  alert("A tela de novo aluno vamos criar no próximo passo.");
 }
+
+// roda automaticamente quando a página abre
+verificarSessao();
 </script>
 
 </body>
