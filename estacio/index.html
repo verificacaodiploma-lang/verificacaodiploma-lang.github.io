@@ -12,6 +12,7 @@
     :root{
       --primary:#0b63ce;
       --primary-dark:#084ea4;
+      --primary-soft:#eaf3ff;
       --accent:#ff4d4f;
       --bg:#f4f7fb;
       --card:#ffffff;
@@ -22,8 +23,8 @@
       --success-bg:#ecfdf5;
       --danger:#dc2626;
       --danger-bg:#fef2f2;
-      --shadow:0 18px 40px rgba(15,23,42,.10);
-      --radius:18px;
+      --shadow:0 20px 45px rgba(15,23,42,.08);
+      --radius:22px;
     }
 
     *{
@@ -35,10 +36,11 @@
       font-family:Arial, sans-serif;
       background:var(--bg);
       color:var(--text);
+      line-height:1.5;
     }
 
     .topbar{
-      background:#ffffff;
+      background:#fff;
       border-bottom:1px solid #e5e7eb;
       position:sticky;
       top:0;
@@ -48,197 +50,213 @@
     .topbar-inner{
       max-width:1200px;
       margin:0 auto;
-      padding:16px 20px;
+      padding:18px 24px;
       display:flex;
       align-items:center;
       justify-content:space-between;
-      gap:16px;
+      gap:20px;
     }
 
-    .logo-wrap{
+    .brand{
       display:flex;
       align-items:center;
-      gap:12px;
+      gap:14px;
     }
 
-    .logo-badge{
-      width:18px;
-      height:18px;
-      transform:rotate(45deg);
-      background:linear-gradient(135deg,#8de0cf,#59b1e6);
-      border-radius:3px;
-      position:relative;
+    .brand img{
+      height:42px;
+      width:auto;
+      display:block;
+      object-fit:contain;
     }
 
-    .logo-badge::after{
-      content:"";
-      position:absolute;
-      inset:4px;
-      border:2px solid rgba(255,255,255,.9);
-      border-radius:2px;
+    .brand-text{
+      display:flex;
+      flex-direction:column;
+      gap:2px;
     }
 
-    .logo-text{
-      font-size:34px;
-      font-weight:400;
+    .brand-title{
+      font-size:26px;
+      font-weight:700;
       color:#5b513f;
       line-height:1;
+    }
+
+    .brand-subtitle{
+      font-size:13px;
+      color:var(--muted);
     }
 
     .top-btn{
       background:var(--accent);
       color:#fff;
       border:none;
-      padding:12px 20px;
-      border-radius:10px;
+      padding:12px 18px;
+      border-radius:12px;
       font-weight:700;
       cursor:pointer;
-      box-shadow:0 10px 20px rgba(255,77,79,.25);
+      box-shadow:0 10px 20px rgba(255,77,79,.20);
     }
 
     .hero{
       background:
-        radial-gradient(circle at 18% 25%, rgba(255,255,255,.18), transparent 28%),
-        radial-gradient(circle at 85% 15%, rgba(255,255,255,.12), transparent 22%),
-        linear-gradient(100deg, #0a74d6 0%, #0b63ce 38%, #0b56b1 100%);
-      min-height:430px;
-      display:flex;
-      align-items:center;
-      overflow:hidden;
+        radial-gradient(circle at 20% 18%, rgba(255,255,255,.15), transparent 24%),
+        radial-gradient(circle at 82% 10%, rgba(255,255,255,.10), transparent 18%),
+        linear-gradient(110deg, #0b73d6 0%, #0b63ce 42%, #0a55ad 100%);
+      color:#fff;
     }
 
     .hero-inner{
       max-width:1200px;
       margin:0 auto;
-      padding:48px 20px;
-      width:100%;
+      padding:72px 24px 130px;
       display:grid;
-      grid-template-columns:1.15fr .85fr;
-      gap:28px;
+      grid-template-columns:1.1fr .9fr;
+      gap:44px;
       align-items:center;
     }
 
-    .hero-text h1{
-      margin:0 0 18px 0;
-      color:#fff;
-      font-size:56px;
-      line-height:1.02;
-      letter-spacing:-1px;
+    .hero-copy{
       max-width:620px;
     }
 
-    .hero-text p{
-      margin:0;
-      color:rgba(255,255,255,.92);
-      font-size:20px;
-      line-height:1.5;
-      max-width:560px;
-    }
-
-    .hero-card{
-      background:rgba(255,255,255,.14);
-      border:1px solid rgba(255,255,255,.18);
-      backdrop-filter:blur(8px);
-      border-radius:28px;
-      padding:26px;
-      color:#fff;
-      box-shadow:0 18px 40px rgba(0,0,0,.12);
-    }
-
-    .hero-card .mini{
-      font-size:15px;
-      opacity:.9;
-      margin-bottom:10px;
-    }
-
-    .hero-card .big{
-      font-size:38px;
-      font-weight:800;
-      line-height:1.05;
-      margin-bottom:12px;
-    }
-
-    .hero-card .pill{
+    .hero-copy .eyebrow{
       display:inline-block;
-      background:#ffde59;
-      color:#1f2937;
-      font-weight:800;
+      background:rgba(255,255,255,.14);
+      border:1px solid rgba(255,255,255,.20);
+      padding:8px 14px;
       border-radius:999px;
-      padding:10px 16px;
-      margin-top:8px;
+      font-size:13px;
+      font-weight:700;
+      margin-bottom:18px;
+    }
+
+    .hero-copy h1{
+      margin:0 0 18px;
+      font-size:58px;
+      line-height:1.02;
+      letter-spacing:-1.2px;
+    }
+
+    .hero-copy p{
+      margin:0;
+      font-size:19px;
+      color:rgba(255,255,255,.92);
+      max-width:540px;
+    }
+
+    .hero-visual{
+      background:rgba(255,255,255,.12);
+      border:1px solid rgba(255,255,255,.18);
+      border-radius:28px;
+      padding:28px;
+      backdrop-filter:blur(8px);
+      box-shadow:0 22px 50px rgba(0,0,0,.12);
+    }
+
+    .hero-visual h2{
+      margin:0 0 10px;
+      font-size:32px;
+      line-height:1.1;
+    }
+
+    .hero-visual p{
+      margin:0 0 18px;
+      color:rgba(255,255,255,.9);
+      font-size:16px;
+    }
+
+    .hero-list{
+      display:grid;
+      gap:12px;
+    }
+
+    .hero-item{
+      background:rgba(255,255,255,.10);
+      border:1px solid rgba(255,255,255,.14);
+      border-radius:16px;
+      padding:14px 16px;
       font-size:15px;
     }
 
     .main-wrap{
-      max-width:1200px;
-      margin:-70px auto 40px;
-      padding:0 20px;
+      max-width:1100px;
+      margin:-64px auto 50px;
+      padding:0 24px;
       position:relative;
       z-index:2;
     }
 
     .consulta-card{
       background:var(--card);
-      border-radius:24px;
+      border-radius:28px;
       box-shadow:var(--shadow);
+      border:1px solid #e9eef5;
       overflow:hidden;
-      border:1px solid #eaf0f7;
     }
 
-    .consulta-header{
-      background:linear-gradient(90deg,var(--primary),var(--primary-dark));
-      color:#fff;
-      padding:22px 26px;
+    .consulta-head{
+      padding:28px 30px 18px;
     }
 
-    .consulta-header h2{
+    .consulta-head h2{
+      margin:0 0 8px;
+      font-size:30px;
+      color:#0f172a;
+    }
+
+    .consulta-head p{
       margin:0;
-      font-size:26px;
-    }
-
-    .consulta-header p{
-      margin:8px 0 0;
-      color:rgba(255,255,255,.88);
+      color:var(--muted);
       font-size:15px;
+      max-width:640px;
     }
 
     .consulta-body{
-      padding:26px;
+      padding:0 30px 30px;
+    }
+
+    .search-box{
+      background:#f8fbff;
+      border:1px solid #e2ebf5;
+      border-radius:20px;
+      padding:18px;
     }
 
     .search{
       display:grid;
       grid-template-columns:1fr auto;
-      gap:12px;
+      gap:14px;
       align-items:center;
     }
 
-    .search input{
+    input[type="text"]{
       width:100%;
-      padding:16px 18px;
+      padding:17px 18px;
       border:1px solid var(--border);
       border-radius:14px;
       font-size:16px;
       outline:none;
-      transition:.2s ease;
       background:#fff;
+      transition:.2s ease;
     }
 
-    .search input:focus{
-      border-color:#8ab6f3;
+    input[type="text"]:focus{
+      border-color:#9ec3f5;
       box-shadow:0 0 0 4px rgba(11,99,206,.10);
     }
 
     .search button{
+      min-width:160px;
+      padding:17px 20px;
       background:linear-gradient(90deg,var(--primary),var(--primary-dark));
       color:#fff;
       border:none;
-      padding:16px 22px;
       border-radius:14px;
       font-size:16px;
       font-weight:700;
       cursor:pointer;
-      min-width:150px;
     }
 
     .helper{
@@ -249,7 +267,7 @@
 
     .loader{
       display:none;
-      margin-top:18px;
+      margin-top:22px;
       color:var(--primary);
       font-weight:700;
       font-size:15px;
@@ -257,22 +275,22 @@
 
     .resultado{
       display:none;
-      margin-top:26px;
-      padding:22px;
-      border:1px solid #e6edf6;
+      margin-top:28px;
       background:#fbfdff;
-      border-radius:18px;
+      border:1px solid #e6edf6;
+      border-radius:22px;
+      padding:24px;
     }
 
     .status{
       display:inline-flex;
       align-items:center;
       gap:8px;
-      padding:8px 14px;
+      padding:9px 15px;
       border-radius:999px;
-      font-weight:800;
       font-size:14px;
-      margin-bottom:18px;
+      font-weight:800;
+      margin-bottom:20px;
     }
 
     .status.ok{
@@ -287,18 +305,25 @@
       border:1px solid #fecaca;
     }
 
-    .grid-info{
+    .result-grid{
       display:grid;
-      grid-template-columns:1fr 220px;
-      gap:24px;
+      grid-template-columns:minmax(0,1fr) 220px;
+      gap:28px;
       align-items:start;
+    }
+
+    .info-card{
+      background:#fff;
+      border:1px solid #e8eef6;
+      border-radius:18px;
+      padding:10px 18px;
     }
 
     .field{
       display:grid;
       grid-template-columns:180px 1fr;
-      gap:12px;
-      padding:12px 0;
+      gap:18px;
+      padding:15px 0;
       border-bottom:1px solid #eef3f8;
     }
 
@@ -309,25 +334,33 @@
     .label{
       color:var(--muted);
       font-weight:700;
+      font-size:14px;
     }
 
     .value{
       font-weight:700;
       word-break:break-word;
+      font-size:15px;
     }
 
-    .qr-box{
+    .qr-card{
       background:#fff;
-      border:1px solid #e6edf6;
-      border-radius:16px;
-      padding:16px;
+      border:1px solid #e8eef6;
+      border-radius:18px;
+      padding:18px;
       text-align:center;
     }
 
-    .qr-box h3{
-      margin:0 0 12px;
-      font-size:15px;
-      color:#334155;
+    .qr-card h3{
+      margin:0 0 8px;
+      font-size:16px;
+      color:#1e293b;
+    }
+
+    .qr-card p{
+      margin:0 0 16px;
+      color:var(--muted);
+      font-size:13px;
     }
 
     #qrcode{
@@ -355,39 +388,45 @@
     }
 
     .footer-note{
-      max-width:1200px;
-      margin:0 auto 36px;
-      padding:0 20px;
+      max-width:1100px;
+      margin:0 auto 40px;
+      padding:0 24px;
       color:#64748b;
-      font-size:14px;
       text-align:center;
+      font-size:14px;
     }
 
-    @media (max-width: 920px){
+    @media (max-width: 980px){
       .hero-inner{
         grid-template-columns:1fr;
+        padding:56px 24px 110px;
       }
 
-      .hero-text h1{
-        font-size:42px;
+      .hero-copy h1{
+        font-size:44px;
       }
 
       .main-wrap{
-        margin:-35px auto 30px;
+        margin:-48px auto 40px;
       }
 
-      .grid-info{
+      .result-grid{
         grid-template-columns:1fr;
       }
     }
 
     @media (max-width: 640px){
       .topbar-inner{
-        padding:14px 16px;
+        padding:16px;
+        align-items:flex-start;
       }
 
-      .logo-text{
-        font-size:28px;
+      .brand img{
+        height:36px;
+      }
+
+      .brand-title{
+        font-size:22px;
       }
 
       .top-btn{
@@ -395,38 +434,41 @@
         font-size:13px;
       }
 
-      .hero{
-        min-height:auto;
-      }
-
       .hero-inner{
-        padding:28px 16px 50px;
+        padding:42px 16px 90px;
+        gap:24px;
       }
 
-      .hero-text h1{
+      .hero-copy h1{
         font-size:34px;
       }
 
-      .hero-text p{
+      .hero-copy p{
         font-size:16px;
       }
 
-      .hero-card{
-        padding:20px;
-        border-radius:20px;
+      .hero-visual{
+        padding:22px;
       }
 
-      .hero-card .big{
-        font-size:30px;
+      .hero-visual h2{
+        font-size:26px;
       }
 
       .main-wrap{
         padding:0 16px;
       }
 
-      .consulta-header,
+      .consulta-head{
+        padding:22px 20px 14px;
+      }
+
+      .consulta-head h2{
+        font-size:25px;
+      }
+
       .consulta-body{
-        padding:18px;
+        padding:0 20px 22px;
       }
 
       .search{
@@ -446,7 +488,7 @@
     @media print{
       .topbar,
       .hero,
-      .search,
+      .search-box,
       .loader,
       .actions,
       .helper{
@@ -470,12 +512,12 @@
 
       .resultado{
         display:block !important;
-        border:none;
         background:#fff;
+        border:none;
         padding:0;
       }
 
-      .grid-info{
+      .result-grid{
         grid-template-columns:1fr;
       }
     }
@@ -486,60 +528,73 @@
 
   <div class="topbar">
     <div class="topbar-inner">
-      <div class="logo-wrap">
-        <div class="logo-badge"></div>
-        <div class="logo-text">Estácio</div>
+      <div class="brand">
+        <img src="logo-estacio.png" alt="Logo Estácio">
+        <div class="brand-text">
+          <div class="brand-title">Estácio</div>
+          <div class="brand-subtitle">Portal acadêmico institucional</div>
+        </div>
       </div>
+
       <button class="top-btn" type="button">Inscreva-se</button>
     </div>
   </div>
 
   <section class="hero">
     <div class="hero-inner">
-      <div class="hero-text">
-        <h1>Consulta de Registro Acadêmico com segurança e praticidade</h1>
+      <div class="hero-copy">
+        <div class="eyebrow">Consulta institucional</div>
+        <h1>Verificação de registros acadêmicos com segurança digital</h1>
         <p>
-          Verifique a autenticidade de diplomas e registros emitidos pela instituição.
-          Consulte os dados do aluno de forma rápida, digital e confiável.
+          Consulte a autenticidade de diplomas e registros emitidos pela Estácio
+          de forma rápida, confiável e integrada ao sistema acadêmico.
         </p>
       </div>
 
-      <div class="hero-card">
-        <div class="mini">Portal acadêmico digital</div>
-        <div class="big">Validação oficial de registros e diplomas</div>
-        <div>
-          Consulte o número do registro e visualize as informações acadêmicas
-          cadastradas no sistema.
+      <div class="hero-visual">
+        <h2>Validação oficial de documentos</h2>
+        <p>
+          Digite o número do registro para confirmar as informações cadastradas
+          na base acadêmica institucional.
+        </p>
+
+        <div class="hero-list">
+          <div class="hero-item">✔ Consulta pública e prática</div>
+          <div class="hero-item">✔ Registro validado em tempo real</div>
+          <div class="hero-item">✔ Visualização clara das informações do aluno</div>
         </div>
-        <div class="pill">Consulta pública Estácio</div>
       </div>
     </div>
   </section>
 
   <div class="main-wrap">
     <div class="consulta-card">
-      <div class="consulta-header">
+      <div class="consulta-head">
         <h2>Consultar diploma</h2>
-        <p>Digite o número do registro acadêmico para validar o documento.</p>
+        <p>
+          Informe o número do registro acadêmico para validar a autenticidade do documento.
+        </p>
       </div>
 
       <div class="consulta-body">
-        <div class="search">
-          <input id="q" placeholder="Digite o número do registro" />
-          <button id="btn" type="button">Consultar</button>
-        </div>
+        <div class="search-box">
+          <div class="search">
+            <input id="q" type="text" placeholder="Digite o número do registro" />
+            <button id="btn" type="button">Consultar</button>
+          </div>
 
-        <div class="helper">
-          Exemplo: informe o registro exatamente como cadastrado pela instituição.
+          <div class="helper">
+            Dica: você pode informar o registro com ou sem hífen.
+          </div>
         </div>
 
         <div id="loader" class="loader">Consultando base acadêmica...</div>
 
         <div id="resultado" class="resultado">
-          <div id="status" class="status ok">● Registro válido</div>
+          <div id="status" class="status ok">● Registro ativo</div>
 
-          <div class="grid-info">
-            <div>
+          <div class="result-grid">
+            <div class="info-card">
               <div class="field"><div class="label">Nome</div><div class="value" id="name"></div></div>
               <div class="field"><div class="label">Curso</div><div class="value" id="degree"></div></div>
               <div class="field"><div class="label">Instituição</div><div class="value" id="inst"></div></div>
@@ -550,8 +605,9 @@
               <div class="field"><div class="label">Data da consulta</div><div class="value" id="datetime"></div></div>
             </div>
 
-            <div class="qr-box">
+            <div class="qr-card">
               <h3>Autenticidade digital</h3>
+              <p>Use o código abaixo para referência desta consulta.</p>
               <div id="qrcode"></div>
             </div>
           </div>
@@ -565,7 +621,7 @@
   </div>
 
   <div class="footer-note">
-    Consulta pública vinculada ao sistema acadêmico institucional.
+    Consulta pública vinculada ao sistema acadêmico institucional da Estácio.
   </div>
 
   <script>
