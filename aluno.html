@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Novo Aluno</title>
+<title>Ficha do Aluno</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -10,7 +10,7 @@
 <style>
 body{
   margin:0;
-  font-family:Arial;
+  font-family:Arial, sans-serif;
   background:#eef3f9;
 }
 
@@ -24,35 +24,46 @@ body{
   background:#fff;
   padding:25px;
   border-radius:12px;
-}
-
-h2{
-  margin-top:0;
+  box-shadow:0 5px 20px rgba(0,0,0,0.05);
 }
 
 input, select, textarea{
   width:100%;
   padding:12px;
   margin-bottom:15px;
-  border-radius:8px;
   border:1px solid #ccc;
+  border-radius:8px;
   font-size:14px;
 }
 
 button{
-  width:100%;
-  padding:14px;
-  background:#005daa;
-  color:#fff;
+  padding:12px 16px;
   border:none;
   border-radius:8px;
-  font-size:16px;
   cursor:pointer;
+  font-weight:bold;
 }
 
-.topo{
+.salvar{
+  background:#005daa;
+  color:#fff;
+  width:100%;
+}
+
+.voltar{
+  background:#111827;
+  color:#fff;
   margin-bottom:15px;
-  color:#555;
+}
+
+h2{
+  margin-top:0;
+}
+
+#msg{
+  margin-top:12px;
+  font-weight:bold;
+  color:green;
 }
 </style>
 </head>
@@ -60,16 +71,14 @@ button{
 <body>
 
 <div class="container">
+
+  <button class="voltar" onclick="voltar()">⬅ Voltar</button>
+
   <div class="card">
-
-    <div class="topo" id="universidadeNome"></div>
-
-    <h2>Cadastrar Novo Aluno</h2>
+    <h2>Ficha do Aluno</h2>
 
     <input id="nome" placeholder="Nome do aluno">
-
     <input id="curso" placeholder="Curso">
-
     <input id="registro" placeholder="Número de registro">
 
     <label>Data de conclusão</label>
@@ -87,11 +96,13 @@ button{
       Mensalidade atrasada
     </label>
 
-    <textarea id="obs" placeholder="Observações (opcional)"></textarea>
+    <textarea id="obs" placeholder="Observações"></textarea>
 
-    <button onclick="salvar()">Salvar aluno</button>
+    <button class="salvar" onclick="salvar()">Salvar alterações</button>
 
+    <div id="msg"></div>
   </div>
+
 </div>
 
 <script>
@@ -100,59 +111,68 @@ const banco = window.supabase.createClient(
   "sb_publishable_cwIQcgCl1O0z_CKo6E8xUQ_Y-VoPyve"
 );
 
-// pegar universidade da URL
-const params = new URLSearchParams(window.location.search);
-const universidade = params.get("universidade") || "estacio";
+// pega ID da URL
+const urlParams = new URLSearchParams(window.location.search);
+const id = urlParams.get("id");
 
-// mostrar nome bonito
-const nomes = {
-  estacio: "Estácio",
-  usp: "USP",
-  anhanguera: "Anhanguera"
-};
-
-document.getElementById("universidadeNome").innerText =
-  "Universidade: " + (nomes[universidade] || universidade);
-
-async function salvar(){
-
-  const nome = document.getElementById("nome").value;
-  const curso = document.getElementById("curso").value;
-  const registro = document.getElementById("registro").value;
-  const conclusao = document.getElementById("conclusao").value;
-  const polo = document.getElementById("polo").value;
-  const status = document.getElementById("status").value;
-  const mensalidade = document.getElementById("mensalidade").checked;
-  const obs = document.getElementById("obs").value;
-
-  if(!nome || !registro){
-    alert("Preencha nome e registro");
-    return;
-  }
-
-  const { error } = await banco.from("registros").insert({
-    nome: nome,
-    curso: curso,
-    registro: registro,
-    conclusao: conclusao,
-    polo: polo,
-    status: status,
-    mensalidade_atrasada: mensalidade,
-    observacoes: obs,
-    universidade_slug: universidade,
-    universidade: nomes[universidade] || universidade
-  });
+// carregar dados do aluno
+async function carregarAluno(){
+  const { data, error } = await banco
+    .from("registros")
+    .select("*")
+    .eq("id", id)
+    .single();
 
   if(error){
-    alert("Erro ao salvar");
-    console.log(error);
+    alert("Erro ao carregar aluno");
+    console.error(error);
     return;
   }
 
-  alert("Aluno cadastrado com sucesso!");
+  document.getElementById("nome").value = data.nome || "";
+  document.getElementById("curso").value = data.curso || "";
+  document.getElementById("registro").value = data.registro || "";
+  document.getElementById("conclusao").value = data.conclusao || "";
+  document.getElementById("polo").value = data.polo || "";
+  document.getElementById("status").value = data.status || "Ativo";
+  document.getElementById("mensalidade").checked = data.mensalidade_atrasada || false;
+  document.getElementById("obs").value = data.observacoes || "";
+}
 
+// salvar alterações
+async function salvar(){
+  const { error } = await banco
+    .from("registros")
+    .update({
+      nome: document.getElementById("nome").value,
+      curso: document.getElementById("curso").value,
+      registro: document.getElementById("registro").value,
+      conclusao: document.getElementById("conclusao").value,
+      polo: document.getElementById("polo").value,
+      status: document.getElementById("status").value,
+      mensalidade_atrasada: document.getElementById("mensalidade").checked,
+      observacoes: document.getElementById("obs").value
+    })
+    .eq("id", id);
+
+  if(error){
+    document.getElementById("msg").innerText = "Erro ao salvar";
+    document.getElementById("msg").style.color = "red";
+    console.error(error);
+    return;
+  }
+
+  document.getElementById("msg").innerText = "Salvo com sucesso!";
+  document.getElementById("msg").style.color = "green";
+}
+
+// voltar para lista
+function voltar(){
   window.location.href = "index.html";
 }
+
+// inicia carregamento
+carregarAluno();
 </script>
 
 </body>
