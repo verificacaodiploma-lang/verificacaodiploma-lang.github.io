@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Ficha do Aluno</title>
+<title>Novo Aluno</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -22,35 +22,37 @@ body{
 
 .card{
   background:#fff;
-  padding:20px;
-  border-radius:10px;
+  padding:25px;
+  border-radius:12px;
+}
+
+h2{
+  margin-top:0;
 }
 
 input, select, textarea{
   width:100%;
   padding:12px;
-  margin-bottom:12px;
-  border:1px solid #ddd;
-  border-radius:6px;
+  margin-bottom:15px;
+  border-radius:8px;
+  border:1px solid #ccc;
+  font-size:14px;
 }
 
 button{
-  padding:12px;
-  border:none;
-  border-radius:6px;
-  cursor:pointer;
-  font-weight:bold;
-}
-
-.salvar{
+  width:100%;
+  padding:14px;
   background:#005daa;
   color:#fff;
+  border:none;
+  border-radius:8px;
+  font-size:16px;
+  cursor:pointer;
 }
 
-.voltar{
-  background:#111827;
-  color:#fff;
-  margin-bottom:10px;
+.topo{
+  margin-bottom:15px;
+  color:#555;
 }
 </style>
 </head>
@@ -58,15 +60,22 @@ button{
 <body>
 
 <div class="container">
-
-  <button class="voltar" onclick="voltar()">⬅ Voltar</button>
-
   <div class="card">
-    <h2>Ficha do Aluno</h2>
 
-    <input id="nome" placeholder="Nome">
+    <div class="topo" id="universidadeNome"></div>
+
+    <h2>Cadastrar Novo Aluno</h2>
+
+    <input id="nome" placeholder="Nome do aluno">
+
     <input id="curso" placeholder="Curso">
-    <input id="registro" placeholder="Registro">
+
+    <input id="registro" placeholder="Número de registro">
+
+    <label>Data de conclusão</label>
+    <input type="date" id="conclusao">
+
+    <input id="polo" placeholder="Polo">
 
     <select id="status">
       <option value="Ativo">Ativo</option>
@@ -78,13 +87,11 @@ button{
       Mensalidade atrasada
     </label>
 
-    <textarea id="obs" placeholder="Observações"></textarea>
+    <textarea id="obs" placeholder="Observações (opcional)"></textarea>
 
-    <button class="salvar" onclick="salvar()">Salvar alterações</button>
+    <button onclick="salvar()">Salvar aluno</button>
 
-    <div id="msg"></div>
   </div>
-
 </div>
 
 <script>
@@ -93,55 +100,59 @@ const banco = window.supabase.createClient(
   "sb_publishable_cwIQcgCl1O0z_CKo6E8xUQ_Y-VoPyve"
 );
 
-const urlParams = new URLSearchParams(window.location.search);
-const id = urlParams.get("id");
+// pegar universidade da URL
+const params = new URLSearchParams(window.location.search);
+const universidade = params.get("universidade") || "estacio";
 
-async function carregarAluno(){
-  const { data, error } = await banco
-    .from("registros")
-    .select("*")
-    .eq("id", id)
-    .single();
+// mostrar nome bonito
+const nomes = {
+  estacio: "Estácio",
+  usp: "USP",
+  anhanguera: "Anhanguera"
+};
 
-  if(error){
-    alert("Erro ao carregar aluno");
-    return;
-  }
-
-  document.getElementById("nome").value = data.nome || "";
-  document.getElementById("curso").value = data.curso || "";
-  document.getElementById("registro").value = data.registro || "";
-  document.getElementById("status").value = data.status || "Ativo";
-  document.getElementById("mensalidade").checked = data.mensalidade_atrasada || false;
-  document.getElementById("obs").value = data.observacoes || "";
-}
+document.getElementById("universidadeNome").innerText =
+  "Universidade: " + (nomes[universidade] || universidade);
 
 async function salvar(){
-  const { error } = await banco
-    .from("registros")
-    .update({
-      nome: document.getElementById("nome").value,
-      curso: document.getElementById("curso").value,
-      registro: document.getElementById("registro").value,
-      status: document.getElementById("status").value,
-      mensalidade_atrasada: document.getElementById("mensalidade").checked,
-      observacoes: document.getElementById("obs").value
-    })
-    .eq("id", id);
 
-  if(error){
-    document.getElementById("msg").innerText = "Erro ao salvar";
+  const nome = document.getElementById("nome").value;
+  const curso = document.getElementById("curso").value;
+  const registro = document.getElementById("registro").value;
+  const conclusao = document.getElementById("conclusao").value;
+  const polo = document.getElementById("polo").value;
+  const status = document.getElementById("status").value;
+  const mensalidade = document.getElementById("mensalidade").checked;
+  const obs = document.getElementById("obs").value;
+
+  if(!nome || !registro){
+    alert("Preencha nome e registro");
     return;
   }
 
-  document.getElementById("msg").innerText = "Salvo com sucesso!";
-}
+  const { error } = await banco.from("registros").insert({
+    nome: nome,
+    curso: curso,
+    registro: registro,
+    conclusao: conclusao,
+    polo: polo,
+    status: status,
+    mensalidade_atrasada: mensalidade,
+    observacoes: obs,
+    universidade_slug: universidade,
+    universidade: nomes[universidade] || universidade
+  });
 
-function voltar(){
+  if(error){
+    alert("Erro ao salvar");
+    console.log(error);
+    return;
+  }
+
+  alert("Aluno cadastrado com sucesso!");
+
   window.location.href = "index.html";
 }
-
-carregarAluno();
 </script>
 
 </body>
