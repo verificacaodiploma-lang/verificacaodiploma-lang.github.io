@@ -91,6 +91,15 @@ body{
   margin-top:6px;
 }
 
+.busca{
+  width:100%;
+  padding:12px;
+  border:1px solid #d1d5db;
+  border-radius:8px;
+  font-size:14px;
+  margin-bottom:14px;
+}
+
 @media (max-width: 640px){
   .grid{
     grid-template-columns:1fr;
@@ -150,6 +159,14 @@ body{
 
     <br>
 
+    <input
+      id="buscaAluno"
+      class="busca"
+      type="text"
+      placeholder="Buscar aluno pelo nome"
+      oninput="filtrarAlunos()"
+    >
+
     <div id="alunos"></div>
 
     <br>
@@ -169,6 +186,7 @@ const banco = window.supabase.createClient(
 
 let universidadeAtual = "";
 let universidadeNomeAtual = "";
+let alunosCache = [];
 
 // Verifica automaticamente se já existe sessão ativa
 async function verificarSessao(){
@@ -221,6 +239,7 @@ async function abrirUniversidade(slug, nome){
   document.getElementById("painel").style.display = "none";
   document.getElementById("listaAlunos").style.display = "block";
   document.getElementById("tituloUniversidade").innerText = nome;
+  document.getElementById("buscaAluno").value = "";
 
   carregarAlunos();
 }
@@ -244,25 +263,40 @@ async function carregarAlunos(){
     return;
   }
 
+  alunosCache = data || [];
+  renderizarAlunos(alunosCache);
+}
+
+function filtrarAlunos(){
+  const termo = document.getElementById("buscaAluno").value.toLowerCase().trim();
+
+  const filtrados = alunosCache.filter(aluno =>
+    String(aluno.nome || "").toLowerCase().includes(termo)
+  );
+
+  renderizarAlunos(filtrados);
+}
+
+function renderizarAlunos(lista){
   let html = "";
 
-  if(!data || data.length === 0){
-    html = `<div class="item-aluno">Nenhum aluno cadastrado.</div>`;
+  if(!lista || lista.length === 0){
+    html = `<div class="item-aluno">Nenhum aluno encontrado.</div>`;
   } else {
-    data.forEach(aluno => {
+    lista.forEach(aluno => {
       const status = aluno.status || "Sem status";
       const statusCor = status.toLowerCase() === "ativo" ? "green" : "blue";
 
-      const mensalidade = aluno.mensalidade_atrasada
-        ? `<span class="badge" style="color:red;">🔴 Mensalidade atrasada</span>`
-        : `<span class="badge" style="color:green;">🟢 Em dia</span>`;
+      const aguardandoPagamento = aluno.mensalidade_atrasada
+        ? `<span class="badge" style="color:red;">🔴 Aguardando pagamento</span>`
+        : `<span class="badge" style="color:green;">🟢 Regular</span>`;
 
       html += `
         <div class="item-aluno" onclick="abrirAluno(${aluno.id})">
           <strong>${aluno.nome || ""}</strong><br>
           <span>${aluno.curso || ""}</span><br>
           <span class="badge" style="color:${statusCor};">● ${status}</span><br>
-          ${mensalidade}
+          ${aguardandoPagamento}
         </div>
       `;
     });
