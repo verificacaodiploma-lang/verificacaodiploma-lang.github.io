@@ -12,7 +12,6 @@
     :root{
       --primary:#0b63ce;
       --primary-dark:#084ea4;
-      --primary-soft:#eaf3ff;
       --accent:#ff4d4f;
       --bg:#f4f7fb;
       --card:#ffffff;
@@ -49,7 +48,7 @@
     .topbar-inner{
       max-width:1200px;
       margin:0 auto;
-      padding:20px 24px;
+      padding:18px 24px;
       display:flex;
       align-items:center;
       justify-content:space-between;
@@ -59,32 +58,13 @@
     .brand{
       display:flex;
       align-items:center;
-      gap:20px;
     }
 
     .brand img{
-      height:60px;
+      height:88px;
       width:auto;
       display:block;
       object-fit:contain;
-    }
-
-    .brand-text{
-      display:flex;
-      flex-direction:column;
-      gap:4px;
-    }
-
-    .brand-title{
-      font-size:32px;
-      font-weight:800;
-      color:#5b513f;
-      line-height:1;
-    }
-
-    .brand-subtitle{
-      font-size:14px;
-      color:var(--muted);
     }
 
     .top-btn{
@@ -304,6 +284,17 @@
       border:1px solid #fecaca;
     }
 
+    .bloqueio{
+      display:none;
+      margin-bottom:20px;
+      background:#fff1f2;
+      color:#b91c1c;
+      border:1px solid #fecdd3;
+      padding:14px 16px;
+      border-radius:14px;
+      font-weight:700;
+    }
+
     .result-grid{
       display:grid;
       grid-template-columns:minmax(0,1fr) 220px;
@@ -386,6 +377,16 @@
       cursor:pointer;
     }
 
+    .btn-disabled{
+      background:#f3f4f6;
+      border:1px solid #d1d5db;
+      color:#9ca3af;
+      padding:12px 18px;
+      border-radius:12px;
+      font-weight:700;
+      cursor:not-allowed;
+    }
+
     .footer-note{
       max-width:1100px;
       margin:0 auto 40px;
@@ -416,29 +417,15 @@
 
     @media (max-width: 640px){
       .topbar-inner{
-        padding:16px;
-        align-items:flex-start;
-      }
-
-      .brand{
-        gap:14px;
+        padding:14px 16px;
       }
 
       .brand img{
-        height:52px;
-      }
-
-      .brand-title{
-        font-size:26px;
-      }
-
-      .brand-subtitle{
-        font-size:13px;
+        height:72px;
       }
 
       .top-btn{
-        padding:10px 14px;
-        font-size:13px;
+        display:none;
       }
 
       .hero-inner{
@@ -497,7 +484,6 @@
       .hero,
       .search-box,
       .loader,
-      .actions,
       .helper{
         display:none !important;
       }
@@ -524,6 +510,10 @@
         padding:0;
       }
 
+      .bloqueio{
+        display:none !important;
+      }
+
       .result-grid{
         grid-template-columns:1fr;
       }
@@ -537,10 +527,6 @@
     <div class="topbar-inner">
       <div class="brand">
         <img src="logo-estacio.png" alt="Logo Estácio">
-        <div class="brand-text">
-          <div class="brand-title">Estácio</div>
-          <div class="brand-subtitle">Portal acadêmico institucional</div>
-        </div>
       </div>
 
       <button class="top-btn" type="button">Inscreva-se</button>
@@ -600,6 +586,10 @@
         <div id="resultado" class="resultado">
           <div id="status" class="status ok">● Registro ativo</div>
 
+          <div id="bloqueio" class="bloqueio">
+            Aguardando pagamento. A impressão do comprovante está temporariamente bloqueada.
+          </div>
+
           <div class="result-grid">
             <div class="info-card">
               <div class="field"><div class="label">Nome</div><div class="value" id="name"></div></div>
@@ -619,8 +609,8 @@
             </div>
           </div>
 
-          <div class="actions">
-            <button class="btn-light" onclick="window.print()" type="button">Imprimir</button>
+          <div class="actions" id="acoes">
+            <button class="btn-light" onclick="imprimirComBloqueio()" type="button">Imprimir</button>
           </div>
         </div>
       </div>
@@ -637,6 +627,8 @@
       "sb_publishable_cwIQcgCl1O0z_CKo6E8xUQ_Y-VoPyve"
     );
 
+    let alunoAtual = null;
+
     function gerarProtocolo(){
       return "EST-" + Math.random().toString(36).substring(2, 8).toUpperCase();
     }
@@ -648,6 +640,15 @@
         .replace(/[^a-zA-Z0-9]/g, "")
         .toUpperCase()
         .trim();
+    }
+
+    function imprimirComBloqueio(){
+      if(alunoAtual && alunoAtual.mensalidade_atrasada){
+        alert("Aguardando pagamento. A impressão do comprovante está bloqueada.");
+        return;
+      }
+
+      window.print();
     }
 
     document.getElementById("btn").addEventListener("click", async () => {
@@ -688,6 +689,8 @@
           return;
         }
 
+        alunoAtual = encontrado;
+
         const protocolo = gerarProtocolo();
         const agora = new Date().toLocaleString("pt-BR");
 
@@ -701,12 +704,25 @@
         document.getElementById("datetime").innerText = agora;
 
         const statusEl = document.getElementById("status");
-        if((encontrado.status || "").toLowerCase() === "ativo"){
-          statusEl.className = "status ok";
-          statusEl.innerText = "● Registro ativo";
-        } else {
+        const bloqueioEl = document.getElementById("bloqueio");
+        const acoesEl = document.getElementById("acoes");
+
+        if(encontrado.mensalidade_atrasada){
           statusEl.className = "status warn";
-          statusEl.innerText = "● Registro concluído";
+          statusEl.innerText = "● Aguardando pagamento";
+          bloqueioEl.style.display = "block";
+          acoesEl.innerHTML = `<button class="btn-disabled" type="button">Impressão bloqueada</button>`;
+        } else {
+          if((encontrado.status || "").toLowerCase() === "ativo"){
+            statusEl.className = "status ok";
+            statusEl.innerText = "● Registro ativo";
+          } else {
+            statusEl.className = "status warn";
+            statusEl.innerText = "● Registro concluído";
+          }
+
+          bloqueioEl.style.display = "none";
+          acoesEl.innerHTML = `<button class="btn-light" onclick="imprimirComBloqueio()" type="button">Imprimir</button>`;
         }
 
         document.getElementById("qrcode").innerHTML = "";
