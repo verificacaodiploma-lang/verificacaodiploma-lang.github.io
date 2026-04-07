@@ -10,12 +10,12 @@
 <style>
 body{
   margin:0;
-  font-family:Arial;
+  font-family:Arial, sans-serif;
   background:#eef3f9;
 }
 
 .container{
-  max-width:700px;
+  max-width:760px;
   margin:40px auto;
   padding:20px;
 }
@@ -24,10 +24,18 @@ body{
   background:#fff;
   padding:25px;
   border-radius:12px;
+  box-shadow:0 8px 24px rgba(0,0,0,.06);
+}
+
+.topo{
+  margin-bottom:15px;
+  color:#555;
+  font-weight:bold;
 }
 
 h2{
   margin-top:0;
+  margin-bottom:20px;
 }
 
 input, select, textarea{
@@ -37,10 +45,15 @@ input, select, textarea{
   border-radius:8px;
   border:1px solid #ccc;
   font-size:14px;
+  box-sizing:border-box;
+}
+
+textarea{
+  min-height:100px;
+  resize:vertical;
 }
 
 button{
-  width:100%;
   padding:14px;
   background:#005daa;
   color:#fff;
@@ -48,11 +61,41 @@ button{
   border-radius:8px;
   font-size:16px;
   cursor:pointer;
+  font-weight:bold;
 }
 
-.topo{
+.btn-voltar{
+  background:#111827;
   margin-bottom:15px;
-  color:#555;
+  width:auto;
+}
+
+.btn-salvar{
+  width:100%;
+}
+
+.checkbox-wrap{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:15px;
+}
+
+.checkbox-wrap input{
+  width:auto;
+  margin:0;
+}
+
+label{
+  display:block;
+  margin-bottom:6px;
+  font-weight:bold;
+  color:#374151;
+}
+
+#msg{
+  margin-top:14px;
+  font-weight:bold;
 }
 </style>
 </head>
@@ -60,37 +103,46 @@ button{
 <body>
 
 <div class="container">
-  <div class="card">
 
+  <button class="btn-voltar" onclick="voltar()">⬅ Voltar</button>
+
+  <div class="card">
     <div class="topo" id="universidadeNome"></div>
 
     <h2>Cadastrar Novo Aluno</h2>
 
+    <label for="nome">Nome do aluno</label>
     <input id="nome" placeholder="Nome do aluno">
 
+    <label for="curso">Curso</label>
     <input id="curso" placeholder="Curso">
 
+    <label for="registro">Número de registro</label>
     <input id="registro" placeholder="Número de registro">
 
-    <label>Data de conclusão</label>
+    <label for="conclusao">Data de conclusão</label>
     <input type="date" id="conclusao">
 
+    <label for="polo">Polo</label>
     <input id="polo" placeholder="Polo">
 
+    <label for="status">Status</label>
     <select id="status">
       <option value="Ativo">Ativo</option>
       <option value="Concluído">Concluído</option>
     </select>
 
-    <label>
+    <div class="checkbox-wrap">
       <input type="checkbox" id="mensalidade">
-      Mensalidade atrasada
-    </label>
+      <span>Aguardando pagamento</span>
+    </div>
 
+    <label for="obs">Observações</label>
     <textarea id="obs" placeholder="Observações (opcional)"></textarea>
 
-    <button onclick="salvar()">Salvar aluno</button>
+    <button class="btn-salvar" onclick="salvar()">Salvar aluno</button>
 
+    <div id="msg"></div>
   </div>
 </div>
 
@@ -100,59 +152,102 @@ const banco = window.supabase.createClient(
   "sb_publishable_cwIQcgCl1O0z_CKo6E8xUQ_Y-VoPyve"
 );
 
-// pegar universidade da URL
 const params = new URLSearchParams(window.location.search);
 const universidade = params.get("universidade") || "estacio";
 
-// mostrar nome bonito
 const nomes = {
   estacio: "Estácio",
   usp: "USP",
-  anhanguera: "Anhanguera"
+  anhanguera: "Anhanguera",
   uniasselvi: "Uniasselvi"
 };
 
 document.getElementById("universidadeNome").innerText =
   "Universidade: " + (nomes[universidade] || universidade);
 
-async function salvar(){
+function voltar(){
+  window.location.href = "index.html";
+}
 
-  const nome = document.getElementById("nome").value;
-  const curso = document.getElementById("curso").value;
-  const registro = document.getElementById("registro").value;
+async function salvar(){
+  const msg = document.getElementById("msg");
+  msg.innerText = "";
+  msg.style.color = "";
+
+  const nome = document.getElementById("nome").value.trim();
+  const curso = document.getElementById("curso").value.trim();
+  const registro = document.getElementById("registro").value.trim();
   const conclusao = document.getElementById("conclusao").value;
-  const polo = document.getElementById("polo").value;
+  const polo = document.getElementById("polo").value.trim();
   const status = document.getElementById("status").value;
   const mensalidade = document.getElementById("mensalidade").checked;
-  const obs = document.getElementById("obs").value;
+  const obs = document.getElementById("obs").value.trim();
 
   if(!nome || !registro){
-    alert("Preencha nome e registro");
+    msg.style.color = "red";
+    msg.innerText = "Preencha pelo menos nome e número de registro.";
     return;
   }
 
-  const { error } = await banco.from("registros").insert({
-    nome: nome,
-    curso: curso,
-    registro: registro,
-    conclusao: conclusao,
-    polo: polo,
-    status: status,
-    mensalidade_atrasada: mensalidade,
-    observacoes: obs,
-    universidade_slug: universidade,
-    universidade: nomes[universidade] || universidade
-  });
+  const { data: existente, error: erroBusca } = await banco
+    .from("registros")
+    .select("id")
+    .eq("universidade_slug", universidade)
+    .eq("registro", registro)
+    .limit(1);
+
+  if(erroBusca){
+    msg.style.color = "red";
+    msg.innerText = "Erro ao verificar registro existente.";
+    console.log(erroBusca);
+    return;
+  }
+
+  if(existente && existente.length > 0){
+    msg.style.color = "red";
+    msg.innerText = "Já existe um aluno com esse número de registro nesta universidade.";
+    return;
+  }
+
+  const { error } = await banco
+    .from("registros")
+    .insert([{
+      nome: nome,
+      curso: curso,
+      registro: registro,
+      conclusao: conclusao,
+      polo: polo,
+      status: status,
+      mensalidade_atrasada: mensalidade,
+      observacoes: obs,
+      universidade_slug: universidade,
+      universidade: nomes[universidade] || universidade
+    }]);
 
   if(error){
-    alert("Erro ao salvar");
     console.log(error);
+
+    if (
+      error.code === "23505" ||
+      String(error.message || "").toLowerCase().includes("duplicate") ||
+      String(error.message || "").toLowerCase().includes("unique")
+    ) {
+      msg.style.color = "red";
+      msg.innerText = "Já existe um aluno com esse número de registro nesta universidade.";
+    } else {
+      msg.style.color = "red";
+      msg.innerText = "Erro ao salvar: " + (error.message || "erro desconhecido");
+    }
+
     return;
   }
 
-  alert("Aluno cadastrado com sucesso!");
+  msg.style.color = "green";
+  msg.innerText = "Aluno cadastrado com sucesso!";
 
-  window.location.href = "index.html";
+  setTimeout(() => {
+    window.location.href = "index.html";
+  }, 1200);
 }
 </script>
 
