@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Redefinir Senha</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+body{
+  margin:0;
+  font-family:Arial, sans-serif;
+  background:#eef3f9;
+}
+
+.container{
+  max-width:500px;
+  margin:60px auto;
+  padding:20px;
+}
+
+.card{
+  background:#fff;
+  padding:28px;
+  border-radius:14px;
+  box-shadow:0 10px 24px rgba(0,0,0,.06);
+}
+
+h2{
+  margin-top:0;
+  color:#111827;
+}
+
+p{
+  color:#6b7280;
+  font-size:14px;
+  line-height:1.5;
+}
+
+input{
+  width:100%;
+  padding:12px;
+  margin-bottom:14px;
+  border:1px solid #d1d5db;
+  border-radius:8px;
+  font-size:14px;
+  box-sizing:border-box;
+}
+
+button{
+  width:100%;
+  padding:14px;
+  background:#005daa;
+  color:#fff;
+  border:none;
+  border-radius:8px;
+  font-size:16px;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+button:hover{
+  opacity:.95;
+}
+
+#msg{
+  margin-top:14px;
+  font-weight:bold;
+}
+
+.link{
+  display:inline-block;
+  margin-top:14px;
+  color:#005daa;
+  text-decoration:underline;
+  cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <div class="card">
+    <h2>Redefinir senha</h2>
+    <p>Digite a nova senha para finalizar a recuperação de acesso.</p>
+
+    <input id="novaSenha" type="password" placeholder="Nova senha">
+    <input id="confirmarSenha" type="password" placeholder="Confirmar nova senha">
+
+    <button onclick="redefinirSenha()">Salvar nova senha</button>
+
+    <div id="msg"></div>
+    <a class="link" href="index.html">Voltar ao login</a>
+  </div>
+</div>
+
+<script>
+const banco = window.supabase.createClient(
+  "https://fghkqwxhrdodyhvfrlzz.supabase.co",
+  "sb_publishable_cwIQcgCl1O0z_CKo6E8xUQ_Y-VoPyve"
+);
+
+async function redefinirSenha(){
+  const novaSenha = document.getElementById("novaSenha").value;
+  const confirmarSenha = document.getElementById("confirmarSenha").value;
+  const msg = document.getElementById("msg");
+
+  msg.textContent = "";
+  msg.style.color = "";
+
+  if(!novaSenha || !confirmarSenha){
+    msg.style.color = "red";
+    msg.textContent = "Preencha os dois campos.";
+    return;
+  }
+
+  if(novaSenha.length < 6){
+    msg.style.color = "red";
+    msg.textContent = "A senha deve ter pelo menos 6 caracteres.";
+    return;
+  }
+
+  if(novaSenha !== confirmarSenha){
+    msg.style.color = "red";
+    msg.textContent = "As senhas não coincidem.";
+    return;
+  }
+
+  const { error } = await banco.auth.updateUser({
+    password: novaSenha
+  });
+
+  if(error){
+    msg.style.color = "red";
+    msg.textContent = "Erro ao redefinir senha: " + error.message;
+    return;
+  }
+
+  msg.style.color = "green";
+  msg.textContent = "Senha redefinida com sucesso! Você já pode entrar com a nova senha.";
+
+  setTimeout(() => {
+    window.location.href = "index.html";
+  }, 1800);
+}
+</script>
+
+</body>
+</html>
