@@ -34,6 +34,7 @@ input, select, textarea{
   border:1px solid #ccc;
   border-radius:8px;
   font-size:14px;
+  box-sizing:border-box;
 }
 
 button{
@@ -46,6 +47,13 @@ button{
 
 .salvar{
   background:#005daa;
+  color:#fff;
+  width:100%;
+  margin-bottom:10px;
+}
+
+.excluir{
+  background:#b91c1c;
   color:#fff;
   width:100%;
 }
@@ -63,7 +71,6 @@ h2{
 #msg{
   margin-top:12px;
   font-weight:bold;
-  color:green;
 }
 </style>
 </head>
@@ -93,12 +100,13 @@ h2{
 
     <label>
       <input type="checkbox" id="mensalidade">
-      Mensalidade atrasada
+      Aguardando pagamento
     </label>
 
     <textarea id="obs" placeholder="Observações"></textarea>
 
     <button class="salvar" onclick="salvar()">Salvar alterações</button>
+    <button class="excluir" onclick="excluirAluno()">Excluir aluno</button>
 
     <div id="msg"></div>
   </div>
@@ -111,11 +119,9 @@ const banco = window.supabase.createClient(
   "sb_publishable_cwIQcgCl1O0z_CKo6E8xUQ_Y-VoPyve"
 );
 
-// pega ID da URL
 const urlParams = new URLSearchParams(window.location.search);
 const id = urlParams.get("id");
 
-// carregar dados do aluno
 async function carregarAluno(){
   const { data, error } = await banco
     .from("registros")
@@ -139,7 +145,6 @@ async function carregarAluno(){
   document.getElementById("obs").value = data.observacoes || "";
 }
 
-// salvar alterações
 async function salvar(){
   const { error } = await banco
     .from("registros")
@@ -166,12 +171,32 @@ async function salvar(){
   document.getElementById("msg").style.color = "green";
 }
 
-// voltar para lista
+async function excluirAluno(){
+  const confirmar = confirm("Tem certeza que deseja excluir este aluno? Essa ação não poderá ser desfeita.");
+
+  if(!confirmar){
+    return;
+  }
+
+  const { error } = await banco
+    .from("registros")
+    .delete()
+    .eq("id", id);
+
+  if(error){
+    alert("Erro ao excluir aluno");
+    console.error(error);
+    return;
+  }
+
+  alert("Aluno excluído com sucesso!");
+  window.location.href = "index.html";
+}
+
 function voltar(){
   window.location.href = "index.html";
 }
 
-// inicia carregamento
 carregarAluno();
 </script>
 
