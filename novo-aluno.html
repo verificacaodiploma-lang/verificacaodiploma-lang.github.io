@@ -133,7 +133,7 @@ label{
     </select>
 
     <div class="checkbox-wrap">
-      <input type="checkbox" id="mensalidade">
+      <input type="checkbox" id="pagamento">
       <span>Aguardando pagamento</span>
     </div>
 
@@ -159,7 +159,10 @@ const nomes = {
   estacio: "Estácio",
   usp: "USP",
   anhanguera: "Anhanguera",
-  uniasselvi: "Uniasselvi"
+  uniasselvi: "Uniasselvi",
+  faveni: "Faveni",
+  unicid: "Unicid",
+  cruzeiro: "Cruzeiro do Sul"
 };
 
 document.getElementById("universidadeNome").innerText =
@@ -180,7 +183,7 @@ async function salvar(){
   const conclusao = document.getElementById("conclusao").value;
   const polo = document.getElementById("polo").value.trim();
   const status = document.getElementById("status").value;
-  const mensalidade = document.getElementById("mensalidade").checked;
+  const pagamento = document.getElementById("pagamento").checked;
   const obs = document.getElementById("obs").value.trim();
 
   if(!nome || !registro){
@@ -218,7 +221,7 @@ async function salvar(){
       conclusao: conclusao,
       polo: polo,
       status: status,
-      mensalidade_atrasada: mensalidade,
+      mensalidade_atrasada: pagamento,
       observacoes: obs,
       universidade_slug: universidade,
       universidade: nomes[universidade] || universidade
