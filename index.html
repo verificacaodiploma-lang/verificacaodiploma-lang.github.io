@@ -15,7 +15,7 @@ body{
 }
 
 .container{
-  max-width:900px;
+  max-width:1000px;
   margin:40px auto;
   padding:20px;
 }
@@ -26,12 +26,6 @@ body{
   border-radius:12px;
   margin-bottom:20px;
   box-shadow:0 10px 24px rgba(0,0,0,.06);
-}
-
-.grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:15px;
 }
 
 .btn{
@@ -81,6 +75,7 @@ body{
   border-radius:8px;
   font-size:14px;
   margin-bottom:14px;
+  box-sizing:border-box;
 }
 
 .link{
@@ -92,8 +87,10 @@ body{
 }
 
 .badge{
+  display:inline-block;
   font-size:12px;
   font-weight:bold;
+  margin-top:6px;
 }
 
 #mensagemLogin{
@@ -105,6 +102,36 @@ body{
   margin-top:10px;
   font-weight:bold;
 }
+
+.grid-uni{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(160px, 1fr));
+  gap:15px;
+  margin-top:20px;
+}
+
+.uni{
+  background:#fff;
+  padding:25px;
+  border-radius:12px;
+  text-align:center;
+  font-weight:bold;
+  cursor:pointer;
+  box-shadow:0 6px 16px rgba(0,0,0,.08);
+  transition:.2s;
+  border:1px solid #e5e7eb;
+}
+
+.uni:hover{
+  transform:translateY(-3px);
+  box-shadow:0 10px 22px rgba(0,0,0,.12);
+}
+
+@media (max-width: 640px){
+  .grid-uni{
+    grid-template-columns:1fr;
+  }
+}
 </style>
 </head>
 
@@ -112,53 +139,75 @@ body{
 
 <div class="container">
 
-<!-- LOGIN -->
-<div id="loginBox" class="card">
-  <h2>Login ADM</h2>
+  <!-- LOGIN -->
+  <div id="loginBox" class="card">
+    <h2>Login ADM</h2>
 
-  <input id="email" placeholder="Email" style="width:100%;padding:12px;">
-  <br><br>
+    <input
+      id="email"
+      type="email"
+      placeholder="Email"
+      style="width:100%;padding:12px;box-sizing:border-box;"
+    >
+    <br><br>
 
-  <input id="senha" type="password" placeholder="Senha" style="width:100%;padding:12px;">
-  <br><br>
+    <input
+      id="senha"
+      type="password"
+      placeholder="Senha"
+      style="width:100%;padding:12px;box-sizing:border-box;"
+    >
+    <br><br>
 
-  <button class="btn" onclick="login()">Entrar</button>
+    <button class="btn" onclick="login()">Entrar</button>
 
-  <div class="link" onclick="esqueciSenha()">Esqueci minha senha</div>
+    <div class="link" onclick="esqueciSenha()">Esqueci minha senha</div>
 
-  <div id="mensagemLogin"></div>
-  <div id="mensagemReset"></div>
-</div>
-
-<!-- PAINEL -->
-<div id="painel" class="card" style="display:none;">
-  <div class="topo">
-    <h2>Universidades</h2>
-    <button class="btn-sec" onclick="logout()">Sair</button>
+    <div id="mensagemLogin"></div>
+    <div id="mensagemReset"></div>
   </div>
 
-  <div class="grid">
-    <button class="btn" onclick="abrirUniversidade('estacio','Estácio')">Estácio</button>
-<button class="btn" onclick="abrirUniversidade('usp','USP')">USP</button>
-<button class="btn" onclick="abrirUniversidade('anhanguera','Anhanguera')">Anhanguera</button>
-<button class="btn" onclick="abrirUniversidade('uniasselvi','Uniasselvi')">Uniasselvi</button>
+  <!-- PAINEL -->
+  <div id="painel" class="card" style="display:none;">
+    <div class="topo">
+      <h2 style="margin:0;">Universidades</h2>
+      <button class="btn-sec" onclick="logout()">Sair</button>
+    </div>
+
+    <div class="grid-uni">
+      <div class="uni" onclick="abrirUniversidade('estacio','Estácio')">Estácio</div>
+      <div class="uni" onclick="abrirUniversidade('uniasselvi','Uniasselvi')">Uniasselvi</div>
+      <div class="uni" onclick="abrirUniversidade('usp','USP')">USP</div>
+      <div class="uni" onclick="abrirUniversidade('anhanguera','Anhanguera')">Anhanguera</div>
+      <div class="uni" onclick="abrirUniversidade('faveni','Faveni')">Faveni</div>
+      <div class="uni" onclick="abrirUniversidade('unicid','Unicid')">Unicid</div>
+      <div class="uni" onclick="abrirUniversidade('cruzeiro','Cruzeiro do Sul')">Cruzeiro do Sul</div>
+    </div>
   </div>
-</div>
 
-<!-- LISTA -->
-<div id="listaAlunos" class="card" style="display:none;">
-  <div class="topo">
-    <h2 id="tituloUniversidade"></h2>
-    <button class="btn-sec" onclick="voltar()">⬅ Voltar</button>
+  <!-- LISTA DE ALUNOS -->
+  <div id="listaAlunos" class="card" style="display:none;">
+    <div class="topo">
+      <h2 id="tituloUniversidade" style="margin:0;"></h2>
+      <button class="btn-sec" onclick="voltar()">⬅ Voltar</button>
+    </div>
+
+    <br>
+
+    <input
+      id="buscaAluno"
+      class="busca"
+      type="text"
+      placeholder="Buscar aluno pelo nome"
+      oninput="filtrarAlunos()"
+    >
+
+    <div id="alunos"></div>
+
+    <br>
+
+    <button class="btn" onclick="novoAluno()">+ Novo aluno</button>
   </div>
-
-  <input class="busca" id="buscaAluno" placeholder="Buscar aluno..." oninput="filtrarAlunos()">
-
-  <div id="alunos"></div>
-
-  <br>
-  <button class="btn" onclick="novoAluno()">+ Novo aluno</button>
-</div>
 
 </div>
 
@@ -171,37 +220,61 @@ const banco = window.supabase.createClient(
 let universidadeAtual = "";
 let alunosCache = [];
 
+// sessão
 async function verificarSessao(){
-  const { data } = await banco.auth.getSession();
-
-  if(data.session){
-    document.getElementById("loginBox").style.display="none";
-    document.getElementById("painel").style.display="block";
-  }
-}
-
-async function login(){
-  const email = document.getElementById("email").value;
-  const senha = document.getElementById("senha").value;
-
-  const { error } = await banco.auth.signInWithPassword({
-    email, password: senha
-  });
+  const { data, error } = await banco.auth.getSession();
 
   if(error){
-    document.getElementById("mensagemLogin").innerText = error.message;
+    console.error("Erro ao verificar sessão:", error);
     return;
   }
 
-  document.getElementById("loginBox").style.display="none";
-  document.getElementById("painel").style.display="block";
+  if(data.session){
+    document.getElementById("loginBox").style.display = "none";
+    document.getElementById("painel").style.display = "block";
+  } else {
+    document.getElementById("loginBox").style.display = "block";
+    document.getElementById("painel").style.display = "none";
+    document.getElementById("listaAlunos").style.display = "none";
+  }
 }
 
+// login
+async function login(){
+  const email = document.getElementById("email").value.trim();
+  const senha = document.getElementById("senha").value;
+  const msg = document.getElementById("mensagemLogin");
+  const resetMsg = document.getElementById("mensagemReset");
+
+  msg.textContent = "";
+  resetMsg.textContent = "";
+
+  const { error } = await banco.auth.signInWithPassword({
+    email,
+    password: senha
+  });
+
+  if(error){
+    msg.textContent = "Erro no login: " + error.message;
+    return;
+  }
+
+  document.getElementById("loginBox").style.display = "none";
+  document.getElementById("painel").style.display = "block";
+}
+
+// recuperação de senha
 async function esqueciSenha(){
-  const email = document.getElementById("email").value;
+  const email = document.getElementById("email").value.trim();
+  const resetMsg = document.getElementById("mensagemReset");
+  const loginMsg = document.getElementById("mensagemLogin");
+
+  loginMsg.textContent = "";
+  resetMsg.textContent = "";
 
   if(!email){
-    document.getElementById("mensagemReset").innerText = "Digite seu email";
+    resetMsg.style.color = "red";
+    resetMsg.textContent = "Digite seu email para recuperar a senha.";
     return;
   }
 
@@ -210,81 +283,107 @@ async function esqueciSenha(){
   });
 
   if(error){
-    document.getElementById("mensagemReset").innerText = error.message;
+    resetMsg.style.color = "red";
+    resetMsg.textContent = "Erro ao enviar recuperação: " + error.message;
     return;
   }
 
-  document.getElementById("mensagemReset").innerText = "Email enviado!";
+  resetMsg.style.color = "green";
+  resetMsg.textContent = "Email de recuperação enviado.";
 }
 
+// logout
 async function logout(){
   await banco.auth.signOut();
   location.reload();
 }
 
+// abrir universidade
 async function abrirUniversidade(slug, nome){
   universidadeAtual = slug;
 
-  document.getElementById("painel").style.display="none";
-  document.getElementById("listaAlunos").style.display="block";
-
+  document.getElementById("painel").style.display = "none";
+  document.getElementById("listaAlunos").style.display = "block";
   document.getElementById("tituloUniversidade").innerText = nome;
+  document.getElementById("buscaAluno").value = "";
 
   carregarAlunos();
 }
 
+// voltar ao painel
 function voltar(){
-  document.getElementById("listaAlunos").style.display="none";
-  document.getElementById("painel").style.display="block";
+  document.getElementById("listaAlunos").style.display = "none";
+  document.getElementById("painel").style.display = "block";
 }
 
+// carregar alunos
 async function carregarAlunos(){
-  const { data } = await banco
+  const { data, error } = await banco
     .from("registros")
     .select("*")
     .eq("universidade_slug", universidadeAtual)
-    .order("nome");
+    .order("nome", { ascending: true });
 
-  alunosCache = data;
-  renderizarAlunos(data);
+  if(error){
+    console.error("Erro ao carregar alunos:", error);
+    return;
+  }
+
+  alunosCache = data || [];
+  renderizarAlunos(alunosCache);
 }
 
+// filtro por nome
 function filtrarAlunos(){
-  const termo = document.getElementById("buscaAluno").value.toLowerCase();
+  const termo = document.getElementById("buscaAluno").value.toLowerCase().trim();
 
-  const filtrados = alunosCache.filter(a =>
-    (a.nome || "").toLowerCase().includes(termo)
+  const filtrados = alunosCache.filter(aluno =>
+    String(aluno.nome || "").toLowerCase().includes(termo)
   );
 
   renderizarAlunos(filtrados);
 }
 
+// renderização da lista
 function renderizarAlunos(lista){
   let html = "";
 
-  lista.forEach(aluno => {
-    html += `
-      <div class="item-aluno" onclick="abrirAluno(${aluno.id})">
-        <strong>${aluno.nome}</strong><br>
-        ${aluno.curso}<br>
-        ${aluno.mensalidade_atrasada 
-          ? '<span style="color:red;">🔴 Aguardando pagamento</span>'
-          : '<span style="color:green;">🟢 Regular</span>'}
-      </div>
-    `;
-  });
+  if(!lista || lista.length === 0){
+    html = `<div class="item-aluno">Nenhum aluno encontrado.</div>`;
+  } else {
+    lista.forEach(aluno => {
+      const status = aluno.status || "Sem status";
+      const statusCor = status.toLowerCase() === "ativo" ? "green" : "blue";
+
+      const aguardandoPagamento = aluno.mensalidade_atrasada
+        ? `<span class="badge" style="color:red;">🔴 Aguardando pagamento</span>`
+        : `<span class="badge" style="color:green;">🟢 Regular</span>`;
+
+      html += `
+        <div class="item-aluno" onclick="abrirAluno(${aluno.id})">
+          <strong>${aluno.nome || ""}</strong><br>
+          <span>${aluno.curso || ""}</span><br>
+          <span class="badge" style="color:${statusCor};">● ${status}</span><br>
+          ${aguardandoPagamento}
+        </div>
+      `;
+    });
+  }
 
   document.getElementById("alunos").innerHTML = html;
 }
 
+// abrir ficha do aluno
 function abrirAluno(id){
   window.location.href = "aluno.html?id=" + id;
 }
 
+// novo aluno
 function novoAluno(){
   window.location.href = "novo-aluno.html?universidade=" + universidadeAtual;
 }
 
+// iniciar
 verificarSessao();
 </script>
 
