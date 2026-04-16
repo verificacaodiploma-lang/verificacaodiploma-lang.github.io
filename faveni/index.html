@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Faveni — Verificação de Diploma</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+
+<style>
+:root {
+  --bg: #f4fdf7;
+  --card: #ffffff;
+  --accent: #166534;
+  --muted: #4b5563;
+  --success: #15803d;
+  --error: #dc2626;
+  --border: #d1fae5;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: system-ui, Arial, sans-serif;
+  background: var(--bg);
+}
+
+header {
+  background: #ecfdf5;
+  padding: 22px;
+  border-bottom: 1px solid var(--border);
+}
+
+.wrap {
+  max-width: 900px;
+  margin: auto;
+}
+
+h1 {
+  margin: 0;
+  color: var(--accent);
+}
+
+.card {
+  background: var(--card);
+  padding: 20px;
+  margin-top: 24px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+}
+
+input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  margin-bottom: 12px;
+}
+
+button {
+  padding: 12px 18px;
+  border-radius: 8px;
+  border: none;
+  background: var(--accent);
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.status {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.ok {
+  background: #ecfdf5;
+  color: var(--success);
+}
+
+.warn {
+  background: #fee2e2;
+  color: var(--error);
+}
+
+.field {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  padding: 10px 0;
+  border-bottom: 1px dashed var(--border);
+}
+
+.label {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.value {
+  font-weight: 600;
+}
+
+#error {
+  color: var(--error);
+  margin-top: 10px;
+  font-weight: 600;
+}
+
+#qrcode {
+  margin-top: 16px;
+}
+
+@media(max-width:640px){
+  .field { grid-template-columns:1fr; }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="wrap">
+    <h1>Faculdade Faveni</h1>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="card">
+    <h3>Verificação de Diploma</h3>
+    <input id="codigo" placeholder="Digite o número de registro">
+    <button onclick="verificar()">Verificar</button>
+    <div id="error"></div>
+  </div>
+
+  <div class="card" id="resultado" style="display:none">
+
+    <div id="status" class="status ok">● Diploma ativo</div>
+
+    <div id="bloqueio" style="display:none;color:#b91c1c;font-weight:bold;margin-bottom:12px;">
+      Aguardando pagamento. Impressão bloqueada.
+    </div>
+
+    <div class="field"><div class="label">Nome</div><div id="nome" class="value"></div></div>
+    <div class="field"><div class="label">Instituição</div><div id="instituicao" class="value"></div></div>
+    <div class="field"><div class="label">Curso</div><div id="curso" class="value"></div></div>
+    <div class="field"><div class="label">Conclusão</div><div id="conclusao" class="value"></div></div>
+    <div class="field"><div class="label">Registro</div><div id="registro" class="value"></div></div>
+    <div class="field"><div class="label">Protocolo</div><div id="protocolo" class="value"></div></div>
+
+    <div id="qrcode"></div>
+
+    <div style="margin-top:15px;">
+      <button id="btnPrint" onclick="imprimir()">Imprimir</button>
+    </div>
+
+  </div>
+
+</main>
+
+<script>
+const banco = window.supabase.createClient(
+  "https://fghkqwxhrdodyhvfrlzz.supabase.co",
+  "sb_publishable_cwIQcgCl1O0z_CKo6E8xUQ_Y-VoPyve"
+);
+
+let atual = null;
+
+function gerarProtocolo(){
+  return "FAV-" + Math.random().toString(36).substring(2,8).toUpperCase();
+}
+
+function normalizar(v){
+  return String(v).replace(/[^a-zA-Z0-9]/g,"").toUpperCase();
+}
+
+async function verificar(){
+
+  const codigo = document.getElementById("codigo").value.trim();
+  const error = document.getElementById("error");
+
+  if(!codigo){
+    error.innerText="Digite um código válido";
+    return;
+  }
+
+  const { data } = await banco
+    .from("registros")
+    .select("*")
+    .eq("universidade_slug","faveni");
+
+  const aluno = data.find(a => normalizar(a.registro) === normalizar(codigo));
+
+  if(!aluno){
+    error.innerText="Registro não encontrado.";
+    return;
+  }
+
+  atual = aluno;
+
+  document.getElementById("resultado").style.display="block";
+  document.getElementById("nome").innerText=aluno.nome;
+  document.getElementById("instituicao").innerText=aluno.universidade;
+  document.getElementById("curso").innerText=aluno.curso;
+  document.getElementById("conclusao").innerText=aluno.conclusao;
+  document.getElementById("registro").innerText=aluno.registro;
+
+  const protocolo = gerarProtocolo();
+  document.getElementById("protocolo").innerText=protocolo;
+
+  document.getElementById("qrcode").innerHTML="";
+  new QRCode(document.getElementById("qrcode"),{
+    text:protocolo,width:100,height:100
+  });
+
+  if(aluno.mensalidade_atrasada){
+    document.getElementById("status").className="status warn";
+    document.getElementById("status").innerText="● Aguardando pagamento";
+    document.getElementById("bloqueio").style.display="block";
+    document.getElementById("btnPrint").disabled=true;
+  } else {
+    document.getElementById("status").className="status ok";
+    document.getElementById("status").innerText="● Diploma ativo";
+    document.getElementById("bloqueio").style.display="none";
+    document.getElementById("btnPrint").disabled=false;
+  }
+
+  error.innerText="";
+}
+
+function imprimir(){
+  if(atual && atual.mensalidade_atrasada){
+    alert("Aguardando pagamento.");
+    return;
+  }
+  window.print();
+}
+</script>
+
+</body>
+</html>
