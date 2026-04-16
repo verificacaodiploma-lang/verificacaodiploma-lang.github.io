@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Universidade Cruzeiro do Sul — Verificação</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+
+<style>
+:root{
+--bg:#f4f8ff;
+--card:#ffffff;
+--accent:#1f4ed8;
+--gold:#fbbf24;
+--muted:#6b7280;
+--error:#b91c1c;
+--ok:#15803d;
+}
+
+body{
+margin:0;
+font-family:Arial;
+background:var(--bg);
+}
+
+header{
+background:linear-gradient(90deg,#1f4ed820,#fbbf2420);
+padding:24px;
+border-bottom:3px solid var(--gold);
+display:flex;
+justify-content:space-between;
+}
+
+.container{
+max-width:900px;
+margin:40px auto;
+padding:20px;
+}
+
+.search{
+background:#fff;
+padding:20px;
+border-radius:12px;
+display:flex;
+gap:10px;
+}
+
+input{
+flex:1;
+padding:12px;
+border-radius:8px;
+border:1px solid #ccc;
+}
+
+button{
+background:var(--accent);
+color:#fff;
+border:none;
+padding:12px;
+border-radius:8px;
+cursor:pointer;
+}
+
+.card{
+background:#fff;
+padding:20px;
+margin-top:20px;
+border-radius:12px;
+}
+
+.status{
+padding:6px 12px;
+border-radius:8px;
+font-weight:bold;
+display:inline-block;
+margin-top:10px;
+}
+
+.ok{background:#e0fce9;color:var(--ok);}
+.warn{background:#ffe5e5;color:var(--error);}
+
+#qrcode{margin-top:10px;}
+</style>
+</head>
+
+<body>
+
+<header>
+<div>Universidade Cruzeiro do Sul</div>
+<div>Verificação Acadêmica</div>
+</header>
+
+<div class="container">
+
+<div class="search">
+<input id="q" placeholder="Digite o número do diploma">
+<button onclick="verificar()">Consultar</button>
+</div>
+
+<div id="erro" style="color:red;margin-top:10px;"></div>
+
+<div id="resultado" class="card" style="display:none">
+
+<h2 id="nome"></h2>
+<div id="curso"></div>
+<div id="inst"></div>
+<div id="data"></div>
+
+<div id="status" class="status"></div>
+
+<div style="margin-top:10px;font-weight:bold" id="registro"></div>
+<div id="protocolo"></div>
+
+<div id="qrcode"></div>
+
+<button id="btnPrint" onclick="imprimir()" style="margin-top:10px;">
+Imprimir
+</button>
+
+<div id="bloqueio" style="display:none;color:red;">
+Aguardando pagamento. Impressão bloqueada.
+</div>
+
+</div>
+
+</div>
+
+<script>
+const banco = window.supabase.createClient(
+"https://fghkqwxhrdodyhvfrlzz.supabase.co",
+"sb_publishable_cwIQcgCl1O0z_CKo6E8xUQ_Y-VoPyve"
+);
+
+let atual=null;
+
+function gerarProtocolo(){
+return "CRZ-" + Math.random().toString(36).substring(2,8).toUpperCase();
+}
+
+function normalizar(v){
+return String(v).replace(/[^a-zA-Z0-9]/g,"").toUpperCase();
+}
+
+async function verificar(){
+
+const codigo=document.getElementById("q").value.trim();
+const erro=document.getElementById("erro");
+
+erro.innerText="";
+
+const { data } = await banco
+.from("registros")
+.select("*")
+.eq("universidade_slug","cruzeiro");
+
+const aluno=data.find(a=>normalizar(a.registro)===normalizar(codigo));
+
+if(!aluno){
+erro.innerText="Diploma não encontrado.";
+return;
+}
+
+atual=aluno;
+
+document.getElementById("resultado").style.display="block";
+document.getElementById("nome").innerText=aluno.nome;
+document.getElementById("curso").innerText=aluno.curso;
+document.getElementById("inst").innerText=aluno.universidade;
+document.getElementById("data").innerText=aluno.conclusao;
+document.getElementById("registro").innerText=aluno.registro;
+
+const protocolo=gerarProtocolo();
+document.getElementById("protocolo").innerText=protocolo;
+
+document.getElementById("qrcode").innerHTML="";
+new QRCode(document.getElementById("qrcode"),{
+text:protocolo,width:100,height:100
+});
+
+if(aluno.mensalidade_atrasada){
+document.getElementById("status").className="status warn";
+document.getElementById("status").innerText="Aguardando pagamento";
+document.getElementById("bloqueio").style.display="block";
+document.getElementById("btnPrint").disabled=true;
+}else{
+document.getElementById("status").className="status ok";
+document.getElementById("status").innerText="Ativo";
+document.getElementById("bloqueio").style.display="none";
+document.getElementById("btnPrint").disabled=false;
+}
+
+}
+
+function imprimir(){
+if(atual && atual.mensalidade_atrasada){
+alert("Pagamento pendente.");
+return;
+}
+window.print();
+}
+</script>
+
+</body>
+</html>
