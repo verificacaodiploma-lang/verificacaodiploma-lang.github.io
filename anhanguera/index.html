@@ -1,1 +1,485 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Anhanguera — Portal de Autenticidade Acadêmica</title>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+
+<style>
+:root {
+  --laranja-escuro:#e65c00;
+  --laranja-claro:#ffb84d;
+  --bg:#fff8f2;
+  --texto:#1f2937;
+  --muted:#6b7280;
+  --card:#ffffff;
+  --borda:#f3e4d6;
+  --vermelho:#b91c1c;
+  --verde:#15803d;
+}
+
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  background:var(--bg);
+  color:var(--texto);
+  min-height:100vh;
+}
+
+header{
+  width:100%;
+  background:linear-gradient(90deg,var(--laranja-escuro),var(--laranja-claro));
+  color:white;
+  padding:36px 16px;
+}
+
+.header-wrap{
+  max-width:1000px;
+  margin:0 auto;
+}
+
+header h1{
+  margin:0;
+  font-size:28px;
+  font-weight:800;
+}
+
+header p{
+  margin:8px 0 0;
+  font-size:15px;
+  opacity:.92;
+}
+
+main{
+  max-width:760px;
+  margin:40px auto;
+  padding:0 20px;
+}
+
+.panel{
+  background:var(--card);
+  border-radius:18px;
+  padding:28px;
+  box-shadow:0 10px 30px rgba(0,0,0,.06);
+  border:1px solid var(--borda);
+}
+
+.search{
+  display:flex;
+  gap:10px;
+  margin-bottom:18px;
+}
+
+input{
+  flex:1;
+  padding:14px 16px;
+  border-radius:10px;
+  border:1px solid #e5e7eb;
+  font-size:15px;
+  background:#fff;
+  outline:none;
+}
+
+input:focus{
+  border-color:var(--laranja-claro);
+  box-shadow:0 0 0 4px rgba(255,184,77,.18);
+}
+
+button{
+  background:var(--laranja-escuro);
+  color:#fff;
+  border:none;
+  padding:14px 18px;
+  border-radius:10px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+button:hover{
+  filter:brightness(.97);
+}
+
+.helper{
+  color:var(--muted);
+  font-size:14px;
+  margin-bottom:14px;
+}
+
+.loader{
+  display:none;
+  margin-bottom:14px;
+  color:var(--laranja-escuro);
+  font-weight:700;
+}
+
+#feedback{
+  color:var(--vermelho);
+  font-size:14px;
+  margin-bottom:14px;
+  font-weight:700;
+}
+
+.resultado{
+  display:none;
+  border:1px solid #f3f4f6;
+  border-radius:14px;
+  padding:22px;
+  background:#fffaf5;
+}
+
+.status{
+  display:inline-block;
+  padding:8px 12px;
+  border-radius:10px;
+  font-weight:800;
+  font-size:14px;
+  margin-bottom:18px;
+}
+
+.status.ok{
+  background:#ecfdf5;
+  color:var(--verde);
+}
+
+.status.warn{
+  background:#fee2e2;
+  color:var(--vermelho);
+}
+
+.bloqueio{
+  display:none;
+  margin-bottom:18px;
+  background:#fff1f2;
+  color:var(--vermelho);
+  border:1px solid #fecaca;
+  padding:12px 14px;
+  border-radius:12px;
+  font-weight:700;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:1fr 160px;
+  gap:20px;
+}
+
+.info .field{
+  padding:12px 0;
+  border-bottom:1px solid #f3f4f6;
+}
+
+.info .field:last-child{
+  border-bottom:none;
+}
+
+.label{
+  color:var(--muted);
+  font-size:13px;
+  margin-bottom:4px;
+  font-weight:700;
+}
+
+.value{
+  font-weight:700;
+}
+
+#qrcode{
+  display:flex;
+  justify-content:center;
+  align-items:flex-start;
+  margin-top:10px;
+}
+
+.qr-box{
+  text-align:center;
+  background:#fff;
+  border:1px solid #eee;
+  border-radius:12px;
+  padding:14px;
+}
+
+.qr-box .small{
+  color:var(--muted);
+  font-size:12px;
+  margin-bottom:10px;
+}
+
+.actions{
+  margin-top:18px;
+}
+
+.print-btn{
+  width:100%;
+}
+
+.print-disabled{
+  width:100%;
+  background:#d1d5db;
+  color:#6b7280;
+  cursor:not-allowed;
+}
+
+footer{
+  margin-top:50px;
+  padding:25px;
+  background:var(--laranja-escuro);
+  color:white;
+  text-align:center;
+  font-size:14px;
+}
+
+@media (max-width: 700px){
+  .search{
+    flex-direction:column;
+  }
+
+  .grid{
+    grid-template-columns:1fr;
+  }
+
+  .print-btn,
+  .print-disabled{
+    width:100%;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="header-wrap">
+    <h1>Anhanguera</h1>
+    <p>Portal de Autenticidade Acadêmica</p>
+  </div>
+</header>
+
+<main>
+  <div class="panel">
+    <div class="search">
+      <input id="q" placeholder="Digite o número do diploma ou registro">
+      <button id="btn" type="button">Consultar</button>
+    </div>
+
+    <div class="helper">Dica: você pode informar com ou sem hífen.</div>
+
+    <div id="loader" class="loader">Consultando base acadêmica...</div>
+    <div id="feedback"></div>
+
+    <div id="resultado" class="resultado">
+      <div id="status" class="status ok">● Registro ativo</div>
+
+      <div id="bloqueio" class="bloqueio">
+        Aguardando pagamento. A impressão do comprovante está temporariamente bloqueada.
+      </div>
+
+      <div class="grid">
+        <div class="info">
+          <div class="field">
+            <div class="label">Nome</div>
+            <div class="value" id="name">—</div>
+          </div>
+
+          <div class="field">
+            <div class="label">Curso</div>
+            <div class="value" id="degree">—</div>
+          </div>
+
+          <div class="field">
+            <div class="label">Instituição</div>
+            <div class="value" id="inst">—</div>
+          </div>
+
+          <div class="field">
+            <div class="label">Conclusão</div>
+            <div class="value" id="date">—</div>
+          </div>
+
+          <div class="field">
+            <div class="label">Polo</div>
+            <div class="value" id="polo">—</div>
+          </div>
+
+          <div class="field">
+            <div class="label">Registro</div>
+            <div class="value" id="dnum">—</div>
+          </div>
+
+          <div class="field">
+            <div class="label">Protocolo</div>
+            <div class="value" id="protocol">—</div>
+          </div>
+
+          <div class="field">
+            <div class="label">Data da consulta</div>
+            <div class="value" id="datetime">—</div>
+          </div>
+        </div>
+
+        <div class="qr-box">
+          <div class="small">Autenticidade digital</div>
+          <div id="qrcode"></div>
+        </div>
+      </div>
+
+      <div class="actions" id="acoes">
+        <button class="print-btn" onclick="imprimirComBloqueio()" type="button">Imprimir</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  © 2026 Anhanguera — Todos os direitos reservados
+</footer>
+
+<script>
+const banco = window.supabase.createClient(
+  "https://fghkqwxhrdodyhvfrlzz.supabase.co",
+  "sb_publishable_cwIQcgCl1O0z_CKo6E8xUQ_Y-VoPyve"
+);
+
+let alunoAtual = null;
+
+const q = document.getElementById("q");
+const btn = document.getElementById("btn");
+const nameEl = document.getElementById("name");
+const degreeEl = document.getElementById("degree");
+const instEl = document.getElementById("inst");
+const dateEl = document.getElementById("date");
+const poloEl = document.getElementById("polo");
+const dnumEl = document.getElementById("dnum");
+const statusEl = document.getElementById("status");
+const feedbackEl = document.getElementById("feedback");
+const resultadoEl = document.getElementById("resultado");
+const loaderEl = document.getElementById("loader");
+const bloqueioEl = document.getElementById("bloqueio");
+const protocolEl = document.getElementById("protocol");
+const datetimeEl = document.getElementById("datetime");
+const acoesEl = document.getElementById("acoes");
+
+function gerarProtocolo(){
+  return "ANH-" + Math.random().toString(36).substring(2, 8).toUpperCase();
+}
+
+function normalizar(valor){
+  return String(valor || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-zA-Z0-9]/g, "")
+    .toUpperCase()
+    .trim();
+}
+
+function clearAll(){
+  alunoAtual = null;
+  nameEl.textContent = "—";
+  degreeEl.textContent = "—";
+  instEl.textContent = "—";
+  dateEl.textContent = "—";
+  poloEl.textContent = "—";
+  dnumEl.textContent = "—";
+  protocolEl.textContent = "—";
+  datetimeEl.textContent = "—";
+  statusEl.textContent = "—";
+  statusEl.className = "status ok";
+  feedbackEl.textContent = "";
+  bloqueioEl.style.display = "none";
+  resultadoEl.style.display = "none";
+  document.getElementById("qrcode").innerHTML = "";
+}
+
+function imprimirComBloqueio(){
+  if(alunoAtual && alunoAtual.mensalidade_atrasada){
+    alert("Aguardando pagamento. A impressão do comprovante está bloqueada.");
+    return;
+  }
+
+  window.print();
+}
+
+btn.onclick = async () => {
+  const value = q.value.trim();
+
+  clearAll();
+
+  if(!value){
+    feedbackEl.textContent = "Informe um código válido.";
+    return;
+  }
+
+  loaderEl.style.display = "block";
+
+  const { data, error } = await banco
+    .from("registros")
+    .select("*")
+    .eq("universidade_slug", "anhanguera");
+
+  loaderEl.style.display = "none";
+
+  if(error){
+    feedbackEl.textContent = "Erro ao consultar registro.";
+    console.error(error);
+    return;
+  }
+
+  const encontrado = (data || []).find(item =>
+    normalizar(item.registro) === normalizar(value)
+  );
+
+  if(!encontrado){
+    feedbackEl.textContent = "Nenhum registro corresponde ao código informado.";
+    return;
+  }
+
+  alunoAtual = encontrado;
+
+  const protocolo = gerarProtocolo();
+  const agora = new Date().toLocaleString("pt-BR");
+
+  nameEl.textContent = encontrado.nome || "—";
+  degreeEl.textContent = encontrado.curso || "—";
+  instEl.textContent = encontrado.universidade || "Anhanguera";
+  dateEl.textContent = encontrado.conclusao || "—";
+  poloEl.textContent = encontrado.polo || "—";
+  dnumEl.textContent = encontrado.registro || "—";
+  protocolEl.textContent = protocolo;
+  datetimeEl.textContent = agora;
+
+  if(encontrado.mensalidade_atrasada){
+    statusEl.textContent = "● Aguardando pagamento";
+    statusEl.className = "status warn";
+    bloqueioEl.style.display = "block";
+    acoesEl.innerHTML = `<button class="print-disabled" type="button">Impressão bloqueada</button>`;
+  } else {
+    if((encontrado.status || "").toLowerCase() === "ativo"){
+      statusEl.textContent = "● Registro ativo";
+      statusEl.className = "status ok";
+    } else {
+      statusEl.textContent = "● Registro concluído";
+      statusEl.className = "status warn";
+    }
+
+    bloqueioEl.style.display = "none";
+    acoesEl.innerHTML = `<button class="print-btn" onclick="imprimirComBloqueio()" type="button">Imprimir</button>`;
+  }
+
+  new QRCode(document.getElementById("qrcode"), {
+    text: protocolo,
+    width: 110,
+    height: 110
+  });
+
+  resultadoEl.style.display = "block";
+};
+</script>
+
+</body>
+</html>
