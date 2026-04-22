@@ -10,15 +10,17 @@
 
 <style>
 :root {
-  --laranja-escuro:#e65c00;
-  --laranja-claro:#ffb84d;
-  --bg:#fff8f2;
+  --vermelho:#d7261e;
+  --vermelho-escuro:#b91c1c;
+  --bg:#f8f8f8;
   --texto:#1f2937;
   --muted:#6b7280;
   --card:#ffffff;
-  --borda:#f3e4d6;
-  --vermelho:#b91c1c;
+  --borda:#e5e7eb;
   --verde:#15803d;
+  --verde-bg:#ecfdf5;
+  --vermelho-bg:#fef2f2;
+  --cinza-faixa:#f3f4f6;
 }
 
 *{
@@ -33,77 +35,154 @@ body{
   min-height:100vh;
 }
 
-header{
-  width:100%;
-  background:linear-gradient(90deg,var(--laranja-escuro),var(--laranja-claro));
-  color:white;
-  padding:36px 16px;
+.topbar{
+  background:#fff;
+  border-bottom:1px solid var(--borda);
 }
 
-.header-wrap{
-  max-width:1000px;
+.topbar-inner{
+  max-width:1200px;
   margin:0 auto;
+  padding:18px 20px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:18px;
 }
 
-header h1{
-  margin:0;
-  font-size:28px;
+.brand{
+  font-size:18px;
   font-weight:800;
+  color:var(--vermelho);
 }
 
-header p{
-  margin:8px 0 0;
+.top-link{
+  color:var(--vermelho);
+  font-weight:700;
+  font-size:14px;
+}
+
+.hero{
+  background:#fff;
+  border-bottom:1px solid var(--borda);
+}
+
+.hero-inner{
+  max-width:1200px;
+  margin:0 auto;
+  padding:28px 20px 22px;
+}
+
+.hero h1{
+  margin:0 0 18px;
+  font-size:42px;
+  line-height:1.05;
+  font-weight:900;
+  color:var(--vermelho);
+  text-transform:uppercase;
+  letter-spacing:-0.8px;
+}
+
+.search-shell{
+  background:#fff;
+  border:1px solid #d1d5db;
+  border-radius:999px;
+  padding:8px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.search-shell input{
+  flex:1;
+  border:none;
+  outline:none;
+  background:transparent;
+  padding:10px 18px;
+  font-size:16px;
+  color:#111827;
+}
+
+.search-shell input::placeholder{
+  color:#9ca3af;
+}
+
+.search-shell button{
+  background:var(--vermelho);
+  color:#fff;
+  border:none;
+  border-radius:999px;
+  padding:12px 22px;
+  font-weight:800;
+  cursor:pointer;
+  white-space:nowrap;
+}
+
+.faixa{
+  background:linear-gradient(90deg,#d7261e 0%, #ef4444 100%);
+  color:#fff;
+}
+
+.faixa-inner{
+  max-width:1200px;
+  margin:0 auto;
+  padding:16px 20px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:18px;
+  flex-wrap:wrap;
+}
+
+.faixa strong{
   font-size:15px;
-  opacity:.92;
+  letter-spacing:.2px;
+}
+
+.contador{
+  display:flex;
+  gap:8px;
+}
+
+.contador-item{
+  background:#374151;
+  color:#fff;
+  padding:8px 10px;
+  border-radius:8px;
+  text-align:center;
+  min-width:58px;
+  font-size:11px;
+  font-weight:700;
+}
+
+.contador-item span{
+  display:block;
+  font-size:20px;
+  line-height:1;
+  margin-bottom:4px;
 }
 
 main{
-  max-width:760px;
-  margin:40px auto;
-  padding:0 20px;
+  max-width:1000px;
+  margin:34px auto 0;
+  padding:0 20px 28px;
+}
+
+.section-title{
+  margin:0 0 18px;
+  color:var(--vermelho);
+  font-size:20px;
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:.3px;
 }
 
 .panel{
   background:var(--card);
   border-radius:18px;
-  padding:28px;
-  box-shadow:0 10px 30px rgba(0,0,0,.06);
+  padding:24px;
+  box-shadow:0 10px 24px rgba(0,0,0,.04);
   border:1px solid var(--borda);
-}
-
-.search{
-  display:flex;
-  gap:10px;
-  margin-bottom:18px;
-}
-
-input{
-  flex:1;
-  padding:14px 16px;
-  border-radius:10px;
-  border:1px solid #e5e7eb;
-  font-size:15px;
-  background:#fff;
-  outline:none;
-}
-
-input:focus{
-  border-color:var(--laranja-claro);
-  box-shadow:0 0 0 4px rgba(255,184,77,.18);
-}
-
-button{
-  background:var(--laranja-escuro);
-  color:#fff;
-  border:none;
-  padding:14px 18px;
-  border-radius:10px;
-  font-weight:700;
-  cursor:pointer;
-}
-
-button:hover{
-  filter:brightness(.97);
 }
 
 .helper{
@@ -115,12 +194,12 @@ button:hover{
 .loader{
   display:none;
   margin-bottom:14px;
-  color:var(--laranja-escuro);
+  color:var(--vermelho);
   font-weight:700;
 }
 
 #feedback{
-  color:var(--vermelho);
+  color:var(--vermelho-escuro);
   font-size:14px;
   margin-bottom:14px;
   font-weight:700;
@@ -128,36 +207,36 @@ button:hover{
 
 .resultado{
   display:none;
-  border:1px solid #f3f4f6;
-  border-radius:14px;
+  border:1px solid var(--borda);
+  border-radius:16px;
   padding:22px;
-  background:#fffaf5;
+  background:#fff;
 }
 
 .status{
   display:inline-block;
   padding:8px 12px;
-  border-radius:10px;
+  border-radius:999px;
   font-weight:800;
   font-size:14px;
   margin-bottom:18px;
 }
 
 .status.ok{
-  background:#ecfdf5;
+  background:var(--verde-bg);
   color:var(--verde);
 }
 
 .status.warn{
-  background:#fee2e2;
-  color:var(--vermelho);
+  background:var(--vermelho-bg);
+  color:var(--vermelho-escuro);
 }
 
 .bloqueio{
   display:none;
   margin-bottom:18px;
   background:#fff1f2;
-  color:var(--vermelho);
+  color:var(--vermelho-escuro);
   border:1px solid #fecaca;
   padding:12px 14px;
   border-radius:12px;
@@ -166,8 +245,8 @@ button:hover{
 
 .grid{
   display:grid;
-  grid-template-columns:1fr 160px;
-  gap:20px;
+  grid-template-columns:1fr 180px;
+  gap:22px;
 }
 
 .info .field{
@@ -184,10 +263,14 @@ button:hover{
   font-size:13px;
   margin-bottom:4px;
   font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.2px;
 }
 
 .value{
   font-weight:700;
+  color:#111827;
+  word-break:break-word;
 }
 
 #qrcode{
@@ -199,9 +282,9 @@ button:hover{
 
 .qr-box{
   text-align:center;
-  background:#fff;
-  border:1px solid #eee;
-  border-radius:12px;
+  background:#fafafa;
+  border:1px solid var(--borda);
+  border-radius:14px;
   padding:14px;
 }
 
@@ -209,6 +292,7 @@ button:hover{
   color:var(--muted);
   font-size:12px;
   margin-bottom:10px;
+  font-weight:700;
 }
 
 .actions{
@@ -217,36 +301,60 @@ button:hover{
 
 .print-btn{
   width:100%;
+  background:#111827;
+  color:#fff;
+  border:none;
+  border-radius:10px;
+  padding:13px 16px;
+  font-weight:800;
+  cursor:pointer;
 }
 
 .print-disabled{
   width:100%;
   background:#d1d5db;
   color:#6b7280;
+  border:none;
+  border-radius:10px;
+  padding:13px 16px;
+  font-weight:800;
   cursor:not-allowed;
 }
 
 footer{
-  margin-top:50px;
-  padding:25px;
-  background:var(--laranja-escuro);
-  color:white;
+  margin-top:46px;
+  padding:24px 20px;
+  background:#fff;
+  color:var(--muted);
   text-align:center;
   font-size:14px;
+  border-top:1px solid var(--borda);
 }
 
-@media (max-width: 700px){
-  .search{
+@media (max-width: 760px){
+  .hero h1{
+    font-size:30px;
+  }
+
+  .search-shell{
     flex-direction:column;
+    border-radius:18px;
+    align-items:stretch;
+  }
+
+  .search-shell button{
+    width:100%;
+    border-radius:12px;
   }
 
   .grid{
     grid-template-columns:1fr;
   }
 
-  .print-btn,
-  .print-disabled{
+  .contador{
     width:100%;
+    justify-content:flex-start;
+    flex-wrap:wrap;
   }
 }
 </style>
@@ -254,21 +362,42 @@ footer{
 
 <body>
 
-<header>
-  <div class="header-wrap">
-    <h1>Anhanguera</h1>
-    <p>Portal de Autenticidade Acadêmica</p>
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">Anhanguera</div>
+    <div class="top-link">Já tenho inscrição ›</div>
   </div>
-</header>
+</div>
 
-<main>
-  <div class="panel">
-    <div class="search">
-      <input id="q" placeholder="Digite o número do diploma ou registro">
+<section class="hero">
+  <div class="hero-inner">
+    <h1>Comece a estudar e transforme sua carreira!</h1>
+
+    <div class="search-shell">
+      <input id="q" placeholder="Busque aqui seu registro acadêmico">
       <button id="btn" type="button">Consultar</button>
     </div>
+  </div>
+</section>
 
-    <div class="helper">Dica: você pode informar com ou sem hífen.</div>
+<section class="faixa">
+  <div class="faixa-inner">
+    <strong>SEMANA DAS ENGENHARIAS: Aproveite por tempo limitado!</strong>
+
+    <div class="contador">
+      <div class="contador-item"><span>04</span>Dias</div>
+      <div class="contador-item"><span>20</span>Horas</div>
+      <div class="contador-item"><span>41</span>Minutos</div>
+      <div class="contador-item"><span>34</span>Segundos</div>
+    </div>
+  </div>
+</section>
+
+<main>
+  <h2 class="section-title">Consulta de autenticidade acadêmica</h2>
+
+  <div class="panel">
+    <div class="helper">Digite o número do diploma ou registro. Você pode consultar com ou sem hífen.</div>
 
     <div id="loader" class="loader">Consultando base acadêmica...</div>
     <div id="feedback"></div>
