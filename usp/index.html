@@ -12,97 +12,97 @@
 <style>
 body {
   margin: 0;
-  font-family: "Segoe UI", Roboto, Arial, sans-serif;
-  background: #f1f1f1;
+  font-family: Arial, sans-serif;
+  background: #f4f6f8;
   color: #333;
 }
 
-/* BARRA AMARELA */
-.gov-barra {
-  height: 6px;
-  background: #ffcc00;
-}
-
-/* HEADER */
-.gov-header {
-  background: #1351b4;
-  color: white;
-  padding: 18px 24px;
-  display: flex;
-  align-items: center;
-  gap: 20px;
-}
-
-.gov-logo {
-  font-weight: bold;
-  font-size: 20px;
+/* TOPO */
+.topo {
   background: white;
-  color: #1351b4;
-  padding: 6px 10px;
-  border-radius: 4px;
+  padding: 15px 20px;
+  border-bottom: 1px solid #ddd;
 }
 
-.gov-titulo {
-  font-size: 16px;
-  line-height: 1.4;
+.topo strong {
+  font-size: 20px;
+  color: #0d47a1;
 }
 
-.gov-titulo span {
-  font-size: 13px;
+/* HERO AZUL */
+.hero {
+  background: #0d47a1;
+  color: white;
+  text-align: center;
+  padding: 50px 20px;
+}
+
+.hero h1 {
+  margin: 0;
+  font-size: 28px;
+}
+
+.hero p {
+  margin-top: 10px;
   opacity: 0.9;
 }
 
-/* CONTAINER */
-.gov-container {
-  max-width: 800px;
-  margin: 50px auto;
+/* CARD */
+.card {
+  max-width: 700px;
+  margin: -40px auto 40px;
   background: white;
-  padding: 30px;
-  border-radius: 6px;
-  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 25px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
 }
 
-.gov-container h2 {
+/* TÍTULO */
+.card h2 {
   margin-top: 0;
-  color: #1351b4;
+  color: #0d47a1;
 }
 
-/* INPUT */
-.gov-input {
-  width: 100%;
+/* BUSCA */
+.busca {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.busca input {
+  flex: 1;
   padding: 14px;
+  border-radius: 6px;
   border: 1px solid #ccc;
-  border-radius: 4px;
   font-size: 15px;
 }
 
-.gov-input:focus {
-  border-color: #1351b4;
+.busca input:focus {
+  border-color: #0d47a1;
   outline: none;
 }
 
 /* BOTÃO */
-.gov-btn {
-  margin-top: 15px;
-  padding: 14px;
-  width: 100%;
-  background: #1351b4;
-  color: white;
+.busca button {
+  padding: 14px 22px;
+  border-radius: 6px;
   border: none;
-  border-radius: 4px;
-  font-weight: 600;
+  background: #0d47a1;
+  color: white;
+  font-weight: bold;
   cursor: pointer;
 }
 
-.gov-btn:hover {
-  background: #0d47a1;
+.busca button:hover {
+  background: #093170;
 }
 
 /* RESULTADO */
 .resultado {
   margin-top: 25px;
   padding: 20px;
-  border-radius: 4px;
+  border-radius: 6px;
   display: none;
   font-size: 14px;
   border: 1px solid #ddd;
@@ -129,39 +129,38 @@ body {
 }
 
 /* FOOTER */
-.gov-footer {
+.footer {
   text-align: center;
   font-size: 12px;
   color: #777;
-  margin: 40px 0;
+  margin-bottom: 30px;
 }
 </style>
 </head>
 
 <body>
 
-<div class="gov-barra"></div>
+<div class="topo">
+  <strong>USP</strong> - Universidade de São Paulo
+</div>
 
-<header class="gov-header">
-  <div class="gov-logo">gov.br</div>
-  <div class="gov-titulo">
-    Universidade de São Paulo<br>
-    <span>Verificação de Autenticidade Acadêmica</span>
+<section class="hero">
+  <h1>Verificação de Autenticidade</h1>
+  <p>Consulte registros acadêmicos oficiais</p>
+</section>
+
+<div class="card">
+  <h2>Consulta de Diploma</h2>
+
+  <div class="busca">
+    <input id="codigo" placeholder="Digite o número do diploma">
+    <button onclick="verificar()">Consultar</button>
   </div>
-</header>
-
-<div class="gov-container">
-  <h2>Consulta de Registro Acadêmico</h2>
-
-  <label>Número do registro ou diploma</label>
-  <input id="codigo" class="gov-input" placeholder="Digite o código">
-
-  <button class="gov-btn" onclick="verificar()">Consultar</button>
 
   <div id="resultado" class="resultado"></div>
 </div>
 
-<div class="gov-footer">
+<div class="footer">
   Sistema oficial de verificação • Universidade de São Paulo
 </div>
 
@@ -221,11 +220,11 @@ async function verificar(){
   const protocolo = gerarProtocolo();
 
   let bloqueio = "";
-  let botao = `<button class="gov-btn" onclick="window.print()">Imprimir</button>`;
+  let botao = `<button onclick="window.print()">Imprimir</button>`;
 
   if(encontrado.mensalidade_atrasada){
     bloqueio = `<div class="bloqueio">Aguardando pagamento. Impressão bloqueada.</div>`;
-    botao = `<button class="gov-btn" disabled>Impressão bloqueada</button>`;
+    botao = `<button disabled>Impressão bloqueada</button>`;
   }
 
   box.className = "resultado sucesso";
@@ -238,8 +237,8 @@ async function verificar(){
     Conclusão: ${encontrado.conclusao}<br>
     Registro: ${encontrado.registro}<br><br>
 
-    Protocolo de validação: <strong>${protocolo}</strong><br>
-    Data da consulta: ${new Date().toLocaleString()}<br>
+    Protocolo: <strong>${protocolo}</strong><br>
+    Data: ${new Date().toLocaleString()}<br>
 
     ${bloqueio}
 
