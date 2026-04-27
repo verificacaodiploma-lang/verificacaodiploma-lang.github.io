@@ -7,7 +7,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
-
 <style>
 body{
   margin:0;
@@ -125,11 +124,43 @@ button{
   align-items:center;
 }
 
-.btn{
-  margin-top:10px;
-  padding:6px 10px;
-  border:1px solid #ccc;
-  background:#eee;
+.btn {
+  margin-top: 10px;
+  padding: 8px 14px;
+  background: #1f8a94;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 3px;
+}
+
+.btn:hover {
+  background: #166d74;
+}
+}
+/* ========================= */
+/* IMPRESSÃO LIMPA (DOCUMENTO) */
+/* ========================= */
+
+@media print {
+
+  body * {
+    visibility: hidden;
+  }
+
+  #area-impressao, #area-impressao * {
+    visibility: visible;
+  }
+
+  #area-impressao {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 40px;
+    background: white;
+  }
+
 }
 </style>
 </head>
@@ -195,20 +226,33 @@ async function verificar(){
   }
 
   box.style.display="block";
-  box.innerHTML="Consultando...";
+ box.innerHTML = `
+  <div id="area-impressao">
 
-  const { data, error } = await banco
-    .from("registros")
-    .select("*")
-    .eq("registro", codigo)
-    .single();
+    <div class="bloco"><strong>Registro confirmado</strong></div>
 
-  if(error || !data){
-    box.className="resultado erro";
-    box.innerHTML="Registro não encontrado.";
-    return;
-  }
+    <div class="bloco">
+      <div class="linha"><b>Nome:</b> ${data.nome}</div>
+      <div class="linha"><b>Curso:</b> ${data.curso}</div>
+      <div class="linha"><b>Instituição:</b> ${data.universidade}</div>
+      <div class="linha"><b>Conclusão:</b> ${data.conclusao}</div>
+      <div class="linha"><b>Registro:</b> ${data.registro}</div>
+    </div>
 
+    <div class="bloco">
+      <div class="linha"><b>Protocolo:</b> ${protocolo}</div>
+      <div class="linha"><b>Data:</b> ${new Date().toLocaleString()}</div>
+    </div>
+
+    <div class="qr">
+      <div id="qrcode"></div>
+    </div>
+
+  </div>
+
+  <button class="btn" onclick="window.print()">Imprimir</button>
+`;
+}
   const protocolo = gerarProtocolo();
 
   box.className="resultado";
