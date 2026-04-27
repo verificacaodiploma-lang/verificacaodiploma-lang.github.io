@@ -29,7 +29,7 @@ body {
   color: #0d47a1;
 }
 
-/* HERO AZUL */
+/* HERO */
 .hero {
   background: #0d47a1;
   color: white;
@@ -57,7 +57,6 @@ body {
   box-shadow: 0 10px 25px rgba(0,0,0,0.08);
 }
 
-/* TÍTULO */
 .card h2 {
   margin-top: 0;
   color: #0d47a1;
@@ -78,12 +77,6 @@ body {
   font-size: 15px;
 }
 
-.busca input:focus {
-  border-color: #0d47a1;
-  outline: none;
-}
-
-/* BOTÃO */
 .busca button {
   padding: 14px 22px;
   border-radius: 6px;
@@ -98,19 +91,34 @@ body {
   background: #093170;
 }
 
+/* LOADER */
+.loader {
+  border: 4px solid #eee;
+  border-top: 4px solid #0d47a1;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  animation: girar 1s linear infinite;
+  margin: 20px auto;
+}
+
+@keyframes girar {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 /* RESULTADO */
 .resultado {
   margin-top: 25px;
-  padding: 20px;
-  border-radius: 6px;
+  padding: 25px;
+  border-radius: 8px;
   display: none;
-  font-size: 14px;
   border: 1px solid #ddd;
+  background: white;
 }
 
 .sucesso {
   border-left: 5px solid #2e7d32;
-  background: #f3faf4;
 }
 
 .erro {
@@ -118,14 +126,48 @@ body {
   background: #fff5f5;
 }
 
+/* ORGANIZAÇÃO */
+.titulo-resultado {
+  font-weight: bold;
+  font-size: 16px;
+  margin-bottom: 15px;
+}
+
+.bloco {
+  margin-bottom: 15px;
+}
+
+.linha {
+  margin-bottom: 6px;
+}
+
+/* QR */
+.qr-area {
+  margin-top: 20px;
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.qr-info {
+  font-size: 13px;
+  color: #555;
+}
+
+/* BOTÃO */
+.btn-imprimir {
+  margin-top: 10px;
+  padding: 8px 14px;
+  border: 1px solid #ccc;
+  background: #f5f5f5;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
 .bloqueio {
   margin-top: 10px;
   color: #c62828;
   font-weight: bold;
-}
-
-#qrcode {
-  margin-top: 15px;
 }
 
 /* FOOTER */
@@ -194,56 +236,61 @@ async function verificar(){
 
   box.style.display = "block";
   box.className = "resultado";
-  box.innerHTML = "Consultando...";
+  box.innerHTML = `<div class="loader"></div>`;
 
   const { data, error } = await banco
     .from("registros")
     .select("*")
-    .eq("universidade_slug", "usp");
+    .eq("universidade_slug", "usp")
+    .eq("registro", codigo)
+    .single();
 
-  if(error){
-    box.className = "resultado erro";
-    box.innerHTML = "Erro ao consultar.";
-    return;
-  }
-
-  const encontrado = data.find(item =>
-    normalizar(item.registro) === normalizar(codigo)
-  );
-
-  if(!encontrado){
+  if(error || !data){
     box.className = "resultado erro";
     box.innerHTML = "Registro não encontrado.";
     return;
   }
 
+  const encontrado = data;
   const protocolo = gerarProtocolo();
 
   let bloqueio = "";
-  let botao = `<button onclick="window.print()">Imprimir</button>`;
+  let botao = `<button class="btn-imprimir" onclick="window.print()">Imprimir</button>`;
 
   if(encontrado.mensalidade_atrasada){
     bloqueio = `<div class="bloqueio">Aguardando pagamento. Impressão bloqueada.</div>`;
-    botao = `<button disabled>Impressão bloqueada</button>`;
+    botao = `<button class="btn-imprimir" disabled>Impressão bloqueada</button>`;
   }
 
   box.className = "resultado sucesso";
   box.innerHTML = `
-    <strong>Registro confirmado</strong><br><br>
+    <div class="titulo-resultado">Registro confirmado</div>
 
-    Nome: ${encontrado.nome}<br>
-    Curso: ${encontrado.curso}<br>
-    Instituição: ${encontrado.universidade}<br>
-    Conclusão: ${encontrado.conclusao}<br>
-    Registro: ${encontrado.registro}<br><br>
+    <div class="bloco">
+      <div class="linha"><strong>Nome:</strong> ${encontrado.nome}</div>
+      <div class="linha"><strong>Curso:</strong> ${encontrado.curso}</div>
+      <div class="linha"><strong>Instituição:</strong> ${encontrado.universidade}</div>
+      <div class="linha"><strong>Conclusão:</strong> ${encontrado.conclusao}</div>
+      <div class="linha"><strong>Registro:</strong> ${encontrado.registro}</div>
+    </div>
 
-    Protocolo: <strong>${protocolo}</strong><br>
-    Data: ${new Date().toLocaleString()}<br>
+    <div class="bloco">
+      <div class="linha"><strong>Protocolo:</strong> ${protocolo}</div>
+      <div class="linha"><strong>Data:</strong> ${new Date().toLocaleString()}</div>
+    </div>
 
     ${bloqueio}
 
-    <div id="qrcode"></div>
-    ${botao}
+    <div class="qr-area">
+      <div id="qrcode"></div>
+
+      <div class="qr-info">
+        Código de validação<br>
+        Utilize este QR para autenticar o registro
+        <br><br>
+        ${botao}
+      </div>
+    </div>
   `;
 
   document.getElementById("qrcode").innerHTML = "";
