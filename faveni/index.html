@@ -66,18 +66,8 @@ body {
   border: 1px solid rgba(255,255,255,0.1);
 }
 
-.panel h2 {
-  margin: 0;
-  font-size: 28px;
-}
-
 .panel h2 span {
   color: #22c55e;
-}
-
-.panel p {
-  opacity: 0.7;
-  margin-bottom: 20px;
 }
 
 /* INPUT */
@@ -101,17 +91,32 @@ button {
   color: white;
   font-weight: bold;
   cursor: pointer;
-  transition: 0.3s;
 }
 
-button:hover {
-  transform: scale(1.03);
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
-/* ERRO */
-#error {
+/* LOADING */
+.loading {
+  display: none;
+  text-align: center;
   margin-top: 10px;
-  color: #f87171;
+}
+
+.spinner {
+  width: 30px;
+  height: 30px;
+  border: 4px solid rgba(255,255,255,0.2);
+  border-top: 4px solid #22c55e;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: auto;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
 /* RESULTADO */
@@ -123,41 +128,63 @@ button:hover {
   display: none;
 }
 
-.field {
-  margin-bottom: 10px;
-}
+.field { margin-bottom: 8px; }
+.label { font-size: 12px; opacity: 0.6; }
+.value { font-weight: bold; }
 
-.label {
-  font-size: 12px;
-  opacity: 0.6;
-}
-
-.value {
-  font-weight: bold;
-}
-
-.status {
-  margin-bottom: 10px;
-  font-weight: bold;
-}
-
+.status { margin-bottom: 8px; font-weight: bold; }
 .ok { color: #4ade80; }
 .warn { color: #f87171; }
 
-#qrcode {
-  margin-top: 10px;
+#error { color: #f87171; margin-top: 10px; }
+
+/* PRINT DEFINITIVO */
+@media print {
+
+  @page {
+    size: A4;
+    margin: 10mm;
+  }
+
+  html, body {
+    width: 100%;
+    height: auto;
+    overflow: hidden;
+    background: white;
+  }
+
+  body * {
+    visibility: hidden;
+  }
+
+  #resultado, #resultado * {
+    visibility: visible;
+  }
+
+  #resultado {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    max-height: 95vh;
+    padding: 10px;
+    background: white;
+    color: black;
+    font-size: 12px;
+    line-height: 1.2;
+    page-break-inside: avoid;
+  }
+
+  button, #qrcode {
+    display: none !important;
+  }
+
 }
 
 /* MOBILE */
 @media(max-width:900px){
-  .container {
-    flex-direction: column;
-  }
-  .right {
-    width: 100%;
-    height: auto;
-    padding: 20px 0;
-  }
+  .container { flex-direction: column; }
+  .right { width: 100%; padding: 20px 0; }
 }
 </style>
 </head>
@@ -180,7 +207,12 @@ button:hover {
       <p>Digite o número de registro</p>
 
       <input id="codigo" placeholder="Ex: 20230012345">
-      <button onclick="verificar()">VERIFICAR</button>
+      <button id="btnVerificar" onclick="verificar()">VERIFICAR</button>
+
+      <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <p>Verificando...</p>
+      </div>
 
       <div id="error"></div>
 
@@ -226,11 +258,17 @@ async function verificar(){
 
   const codigo = document.getElementById("codigo").value.trim();
   const error = document.getElementById("error");
+  const loading = document.getElementById("loading");
+  const btn = document.getElementById("btnVerificar");
 
   if(!codigo){
     error.innerText="Digite um código válido";
     return;
   }
+
+  error.innerText="";
+  loading.style.display="block";
+  btn.disabled = true;
 
   const { data } = await banco
     .from("registros")
@@ -238,6 +276,9 @@ async function verificar(){
     .eq("universidade_slug","faveni");
 
   const aluno = data.find(a => normalizar(a.registro) === normalizar(codigo));
+
+  loading.style.display="none";
+  btn.disabled = false;
 
   if(!aluno){
     error.innerText="Registro não encontrado.";
@@ -270,8 +311,6 @@ async function verificar(){
     document.getElementById("status").innerText="● Diploma ativo";
     document.getElementById("btnPrint").disabled=false;
   }
-
-  error.innerText="";
 }
 
 function imprimir(){
