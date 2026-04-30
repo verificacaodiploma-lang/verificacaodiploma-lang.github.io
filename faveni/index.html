@@ -1,165 +1,210 @@
+```html
 <!doctype html>
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Faveni — Verificação de Diploma</title>
+<title>Faveni — Consulta Pública</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 
 <style>
-:root {
-  --bg: #f4fdf7;
-  --card: #ffffff;
-  --accent: #166534;
-  --muted: #4b5563;
-  --success: #15803d;
-  --error: #dc2626;
-  --border: #d1fae5;
-}
-
-* { box-sizing: border-box; }
-
 body {
   margin: 0;
-  font-family: system-ui, Arial, sans-serif;
-  background: var(--bg);
+  font-family: Arial, sans-serif;
+  background: #0b1f1a;
+  color: white;
 }
 
-header {
-  background: #ecfdf5;
-  padding: 22px;
-  border-bottom: 1px solid var(--border);
+.container {
+  display: flex;
+  height: 100vh;
 }
 
-.wrap {
-  max-width: 900px;
-  margin: auto;
+/* ESQUERDA */
+.left {
+  flex: 1;
+  background: url("https://images.unsplash.com/photo-1523240795612-9a054b0db644") center/cover no-repeat;
+  position: relative;
 }
 
-h1 {
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 50, 30, 0.75);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 60px;
+}
+
+.overlay h1 {
+  font-size: 48px;
   margin: 0;
-  color: var(--accent);
 }
 
-.card {
-  background: var(--card);
-  padding: 20px;
-  margin-top: 24px;
-  border-radius: 14px;
-  border: 1px solid var(--border);
+.overlay p {
+  opacity: 0.8;
 }
 
+/* DIREITA */
+.right {
+  width: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* PAINEL */
+.panel {
+  width: 90%;
+  padding: 30px;
+  border-radius: 16px;
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.panel h2 {
+  margin: 0;
+  font-size: 28px;
+}
+
+.panel h2 span {
+  color: #22c55e;
+}
+
+.panel p {
+  opacity: 0.7;
+  margin-bottom: 20px;
+}
+
+/* INPUT */
 input {
   width: 100%;
   padding: 12px;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  margin-bottom: 12px;
-}
-
-button {
-  padding: 12px 18px;
+  margin-bottom: 15px;
   border-radius: 8px;
   border: none;
-  background: var(--accent);
+  background: rgba(255,255,255,0.1);
   color: white;
-  font-weight: 700;
+}
+
+/* BOTÃO */
+button {
+  width: 100%;
+  padding: 14px;
+  border-radius: 8px;
+  border: none;
+  background: linear-gradient(90deg, #16a34a, #22c55e);
+  color: white;
+  font-weight: bold;
   cursor: pointer;
+  transition: 0.3s;
 }
 
-.status {
-  display: inline-block;
-  padding: 6px 12px;
-  border-radius: 999px;
-  font-weight: 700;
-  margin-bottom: 16px;
+button:hover {
+  transform: scale(1.03);
 }
 
-.ok {
-  background: #ecfdf5;
-  color: var(--success);
+/* ERRO */
+#error {
+  margin-top: 10px;
+  color: #f87171;
 }
 
-.warn {
-  background: #fee2e2;
-  color: var(--error);
+/* RESULTADO */
+.resultado {
+  margin-top: 20px;
+  background: rgba(255,255,255,0.05);
+  padding: 15px;
+  border-radius: 10px;
+  display: none;
 }
 
 .field {
-  display: grid;
-  grid-template-columns: 220px 1fr;
-  padding: 10px 0;
-  border-bottom: 1px dashed var(--border);
+  margin-bottom: 10px;
 }
 
 .label {
-  color: var(--muted);
-  font-weight: 600;
+  font-size: 12px;
+  opacity: 0.6;
 }
 
 .value {
-  font-weight: 600;
+  font-weight: bold;
 }
 
-#error {
-  color: var(--error);
-  margin-top: 10px;
-  font-weight: 600;
+.status {
+  margin-bottom: 10px;
+  font-weight: bold;
 }
+
+.ok { color: #4ade80; }
+.warn { color: #f87171; }
 
 #qrcode {
-  margin-top: 16px;
+  margin-top: 10px;
 }
 
-@media(max-width:640px){
-  .field { grid-template-columns:1fr; }
+/* MOBILE */
+@media(max-width:900px){
+  .container {
+    flex-direction: column;
+  }
+  .right {
+    width: 100%;
+    height: auto;
+    padding: 20px 0;
+  }
 }
 </style>
 </head>
 
 <body>
 
-<header>
-  <div class="wrap">
-    <h1>Faculdade Faveni</h1>
-  </div>
-</header>
+<div class="container">
 
-<main class="wrap">
-
-  <div class="card">
-    <h3>Verificação de Diploma</h3>
-    <input id="codigo" placeholder="Digite o número de registro">
-    <button onclick="verificar()">Verificar</button>
-    <div id="error"></div>
-  </div>
-
-  <div class="card" id="resultado" style="display:none">
-
-    <div id="status" class="status ok">● Diploma ativo</div>
-
-    <div id="bloqueio" style="display:none;color:#b91c1c;font-weight:bold;margin-bottom:12px;">
-      Aguardando pagamento. Impressão bloqueada.
+  <div class="left">
+    <div class="overlay">
+      <h1>FAVENI</h1>
+      <p>Faculdade Venda Nova do Imigrante</p>
     </div>
-
-    <div class="field"><div class="label">Nome</div><div id="nome" class="value"></div></div>
-    <div class="field"><div class="label">Instituição</div><div id="instituicao" class="value"></div></div>
-    <div class="field"><div class="label">Curso</div><div id="curso" class="value"></div></div>
-    <div class="field"><div class="label">Conclusão</div><div id="conclusao" class="value"></div></div>
-    <div class="field"><div class="label">Registro</div><div id="registro" class="value"></div></div>
-    <div class="field"><div class="label">Protocolo</div><div id="protocolo" class="value"></div></div>
-
-    <div id="qrcode"></div>
-
-    <div style="margin-top:15px;">
-      <button id="btnPrint" onclick="imprimir()">Imprimir</button>
-    </div>
-
   </div>
 
-</main>
+  <div class="right">
+    <div class="panel">
+
+      <h2>Consulta <span>Pública</span></h2>
+      <p>Digite o número de registro</p>
+
+      <input id="codigo" placeholder="Ex: 20230012345">
+      <button onclick="verificar()">VERIFICAR</button>
+
+      <div id="error"></div>
+
+      <div class="resultado" id="resultado">
+
+        <div id="status" class="status ok">● Diploma ativo</div>
+
+        <div class="field"><div class="label">Nome</div><div id="nome" class="value"></div></div>
+        <div class="field"><div class="label">Instituição</div><div id="instituicao" class="value"></div></div>
+        <div class="field"><div class="label">Curso</div><div id="curso" class="value"></div></div>
+        <div class="field"><div class="label">Conclusão</div><div id="conclusao" class="value"></div></div>
+        <div class="field"><div class="label">Registro</div><div id="registro" class="value"></div></div>
+        <div class="field"><div class="label">Protocolo</div><div id="protocolo" class="value"></div></div>
+
+        <div id="qrcode"></div>
+
+        <button id="btnPrint" onclick="imprimir()">Imprimir</button>
+
+      </div>
+
+    </div>
+  </div>
+
+</div>
 
 <script>
 const banco = window.supabase.createClient(
@@ -219,12 +264,10 @@ async function verificar(){
   if(aluno.mensalidade_atrasada){
     document.getElementById("status").className="status warn";
     document.getElementById("status").innerText="● Aguardando pagamento";
-    document.getElementById("bloqueio").style.display="block";
     document.getElementById("btnPrint").disabled=true;
   } else {
     document.getElementById("status").className="status ok";
     document.getElementById("status").innerText="● Diploma ativo";
-    document.getElementById("bloqueio").style.display="none";
     document.getElementById("btnPrint").disabled=false;
   }
 
@@ -242,3 +285,4 @@ function imprimir(){
 
 </body>
 </html>
+```
