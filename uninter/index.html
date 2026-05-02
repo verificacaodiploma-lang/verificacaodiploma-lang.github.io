@@ -6,167 +6,266 @@
 
 <title>Verificação de Diploma</title>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- Fonte mais próxima -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet">
 
 <style>
-:root {
-  --bg: #020617;
-  --blue: #3b82f6;
-  --blue-strong: #2563eb;
-  --text: #e5e7eb;
-  --muted: #94a3b8;
+:root{
+  --bg:#020617;
+  --blue:#3b82f6;
+  --blue-strong:#2563eb;
+  --text:#e5e7eb;
+  --muted:#94a3b8;
 }
 
-* { box-sizing: border-box; }
+*{box-sizing:border-box;margin:0;padding:0}
 
-body {
-  margin: 0;
-  font-family: "Inter", sans-serif;
-  background: radial-gradient(circle at top, #0b1120, #020617);
-  color: var(--text);
+body{
+  font-family:Inter,sans-serif;
+  background:#020617;
+  color:var(--text);
+}
+
+/* HEADER */
+.header{
+  height:72px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 50px;
+  border-bottom:1px solid rgba(255,255,255,0.06);
+  position:relative;
+}
+
+.header::after{
+  content:"";
+  position:absolute;
+  bottom:0;
+  left:0;
+  width:100%;
+  height:2px;
+  background:linear-gradient(90deg, transparent, var(--blue), transparent);
+}
+
+.logo{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-weight:600;
+}
+
+.logo span{
+  color:var(--blue);
+}
+
+.nav{
+  display:flex;
+  gap:30px;
+  font-size:14px;
+  color:var(--muted);
+}
+
+.login{
+  border:1px solid rgba(255,255,255,0.2);
+  padding:8px 16px;
+  border-radius:10px;
 }
 
 /* LAYOUT */
-.container {
-  display: flex;
-  min-height: 100vh;
+.container{
+  display:flex;
+  min-height:calc(100vh - 72px);
 }
 
-/* ESQUERDA */
-.left {
-  flex: 1;
-  background: url('https://images.unsplash.com/photo-1523240795612-9a054b0db644') center/cover;
-  position: relative;
+/* LEFT */
+.left{
+  flex:1;
+  background:url('https://images.unsplash.com/photo-1523240795612-9a054b0db644') center/cover;
+  position:relative;
 }
 
-.left::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, rgba(2,6,23,0.95), rgba(2,6,23,0.5));
+.left::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(90deg,#020617 25%,rgba(2,6,23,0.5));
 }
 
-.left-content {
-  position: relative;
-  z-index: 2;
-  padding: 90px 70px;
-  max-width: 520px;
+.left-content{
+  position:relative;
+  z-index:2;
+  padding:100px 80px;
+  max-width:540px;
 }
 
-.left small {
-  color: var(--blue);
-  letter-spacing: 2px;
-  font-size: 12px;
+.left small{
+  color:var(--blue);
+  letter-spacing:2px;
+  font-size:12px;
 }
 
-.left h1 {
-  font-size: 52px;
-  margin: 10px 0;
+.left h1{
+  font-family:"Playfair Display", serif;
+  font-size:56px;
+  margin:15px 0;
+  line-height:1.1;
 }
 
-.left p {
-  color: var(--muted);
-  line-height: 1.6;
+.left p{
+  color:var(--muted);
+  margin-bottom:30px;
 }
 
-/* DIREITA */
-.right {
-  width: 480px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.features div{
+  margin:12px 0;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+/* RIGHT */
+.right{
+  width:500px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
 }
 
 /* CARD */
-.card {
-  width: 100%;
-  margin: 20px;
-  padding: 35px;
-  border-radius: 18px;
-  background: rgba(15,23,42,0.6);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(59,130,246,0.2);
-  box-shadow: 0 0 40px rgba(59,130,246,0.15);
+.card{
+  width:100%;
+  margin:20px;
+  padding:40px;
+  border-radius:22px;
+  background:rgba(15,23,42,0.75);
+  backdrop-filter:blur(25px);
+
+  border:1px solid rgba(59,130,246,0.4);
+
+  box-shadow:
+    0 0 0 1px rgba(59,130,246,0.15),
+    0 0 80px rgba(59,130,246,0.25);
 }
 
-/* TÍTULO */
-.card h2 {
-  font-size: 24px;
-  margin-bottom: 5px;
+/* ICON TOP */
+.icon{
+  width:60px;
+  height:60px;
+  border-radius:50%;
+  border:1px solid rgba(59,130,246,0.5);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin-bottom:20px;
 }
 
-.card h2 span {
-  color: var(--blue);
+/* TITLE */
+.card h2{
+  font-size:26px;
+  margin-bottom:5px;
 }
 
-.sub {
-  font-size: 13px;
-  color: var(--muted);
-  margin-bottom: 20px;
+.card h2 span{
+  color:var(--blue);
+}
+
+.sub{
+  color:var(--muted);
+  font-size:14px;
+  margin-bottom:20px;
 }
 
 /* INPUT */
-input {
-  width: 100%;
-  padding: 14px;
-  border-radius: 10px;
-  border: 1px solid rgba(255,255,255,0.1);
-  background: rgba(255,255,255,0.03);
-  color: white;
-  outline: none;
+input{
+  width:100%;
+  padding:15px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,0.1);
+  background:rgba(255,255,255,0.02);
+  color:white;
 }
 
-input:focus {
-  border-color: var(--blue);
-  box-shadow: 0 0 10px rgba(59,130,246,0.4);
+input:focus{
+  outline:none;
+  border-color:var(--blue);
 }
 
-/* BOTÃO */
-button {
-  width: 100%;
-  margin-top: 20px;
-  padding: 15px;
-  border-radius: 10px;
-  border: none;
-  background: var(--blue-strong);
-  color: white;
-  font-weight: bold;
-  cursor: pointer;
-  transition: 0.2s;
+/* BUTTON */
+.primary{
+  width:100%;
+  margin-top:18px;
+  padding:16px;
+  border-radius:12px;
+  border:none;
+
+  background:linear-gradient(180deg,#3b82f6,#2563eb);
+
+  color:white;
+  font-weight:600;
+  cursor:pointer;
 }
 
-button:hover {
-  background: var(--blue);
+/* DIVIDER */
+.divider{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin:20px 0;
+  color:var(--muted);
 }
 
-/* RESULTADO */
-.result {
-  margin-top: 25px;
-  display: none;
+.divider::before,
+.divider::after{
+  content:"";
+  flex:1;
+  height:1px;
+  background:rgba(255,255,255,0.1);
 }
 
-.field {
-  margin-bottom: 10px;
+/* QR BUTTON */
+.secondary{
+  width:100%;
+  padding:15px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,0.2);
+  background:transparent;
+  color:white;
 }
 
-.label {
-  font-size: 12px;
-  color: var(--muted);
+/* NOTICE */
+.notice{
+  margin-top:20px;
+  padding:15px;
+  border-radius:12px;
+  background:rgba(34,197,94,0.08);
+  border:1px solid rgba(34,197,94,0.3);
+  color:#4ade80;
 }
 
-.value {
-  font-weight: bold;
-}
-
-/* ERRO */
-.error {
-  color: #f87171;
-  margin-top: 10px;
+/* FOOTER */
+.footer{
+  display:flex;
+  justify-content:space-between;
+  padding:15px 50px;
+  border-top:1px solid rgba(255,255,255,0.06);
+  font-size:13px;
+  color:var(--muted);
 }
 </style>
 </head>
 
 <body>
+
+<div class="header">
+  <div class="logo"><span>◉</span> UNINTER</div>
+  <div class="nav">
+    <div>Institucional</div>
+    <div>Cursos</div>
+    <div>Uninter Responde</div>
+    <div>Contato</div>
+  </div>
+  <div class="login">Área do Aluno</div>
+</div>
 
 <div class="container">
 
@@ -175,46 +274,33 @@ button:hover {
       <small>SISTEMA DE VERIFICAÇÃO</small>
       <h1>Verificação<br>de Diploma</h1>
       <p>Consulte a autenticidade de diplomas emitidos pela instituição.</p>
+
+      <div class="features">
+        <div>✔ Consulta rápida e segura</div>
+        <div>✔ Sistema oficial e confiável</div>
+        <div>✔ Informações atualizadas</div>
+      </div>
     </div>
   </div>
 
   <div class="right">
     <div class="card">
 
+      <div class="icon">📄</div>
+
       <h2>Consulta <span>Pública</span></h2>
       <div class="sub">Digite o número do registro acadêmico</div>
 
-      <input type="text" id="codigo" placeholder="Ex: 20230012345">
+      <input placeholder="Ex: 20230012345">
 
-      <button onclick="verificar()">VERIFICAR</button>
+      <button class="primary">VERIFICAR →</button>
 
-      <div id="erro" class="error"></div>
+      <div class="divider">ou</div>
 
-      <div id="resultado" class="result">
-        <div class="field">
-          <div class="label">Nome</div>
-          <div id="nome" class="value"></div>
-        </div>
+      <button class="secondary">📷 Ler QR Code do Diploma</button>
 
-        <div class="field">
-          <div class="label">Instituição</div>
-          <div id="instituicao" class="value"></div>
-        </div>
-
-        <div class="field">
-          <div class="label">Curso</div>
-          <div id="curso" class="value"></div>
-        </div>
-
-        <div class="field">
-          <div class="label">Conclusão</div>
-          <div id="conclusao" class="value"></div>
-        </div>
-
-        <div class="field">
-          <div class="label">Registro</div>
-          <div id="registro" class="value"></div>
-        </div>
+      <div class="notice">
+        Seus dados estão protegidos e são utilizados apenas para consulta.
       </div>
 
     </div>
@@ -222,45 +308,11 @@ button:hover {
 
 </div>
 
-<script>
-const supabase = window.supabase.createClient(
-  "SUA_URL_AQUI",
-  "SUA_ANON_KEY_AQUI"
-);
-
-async function verificar() {
-  const codigo = document.getElementById("codigo").value.trim();
-  const erro = document.getElementById("erro");
-  const resultado = document.getElementById("resultado");
-
-  erro.innerText = "";
-  resultado.style.display = "none";
-
-  if (!codigo) {
-    erro.innerText = "Digite um número de registro.";
-    return;
-  }
-
-  const { data, error } = await supabase
-    .from("diplomas")
-    .select("*")
-    .eq("registro", codigo)
-    .single();
-
-  if (error || !data) {
-    erro.innerText = "Registro não encontrado.";
-    return;
-  }
-
-  nome.innerText = data.nome;
-  instituicao.innerText = data.instituicao;
-  curso.innerText = data.curso;
-  conclusao.innerText = data.conclusao;
-  registro.innerText = data.registro;
-
-  resultado.style.display = "block";
-}
-</script>
+<div class="footer">
+  <div>Sistema oficial</div>
+  <div>Ambiente seguro</div>
+  <div>Dados atualizados em tempo real</div>
+</div>
 
 </body>
 </html>
