@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Verificação de Diploma</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+:root {
+  --bg: #0b1120;
+  --card: rgba(255,255,255,0.05);
+  --blue: #2563eb;
+  --blue-light: #3b82f6;
+  --text: #e5e7eb;
+  --muted: #94a3b8;
+  --border: rgba(255,255,255,0.1);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(120deg, #0b1120, #020617);
+  color: var(--text);
+}
+
+/* LAYOUT */
+.container {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ESQUERDA */
+.left {
+  flex: 1;
+  background: url('https://images.unsplash.com/photo-1523240795612-9a054b0db644') center/cover;
+  position: relative;
+}
+
+.left::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(2,6,23,0.95), rgba(2,6,23,0.6));
+}
+
+.left-content {
+  position: relative;
+  z-index: 2;
+  padding: 60px;
+  max-width: 500px;
+}
+
+.left h1 {
+  font-size: 42px;
+  margin-bottom: 16px;
+}
+
+.left p {
+  color: var(--muted);
+}
+
+/* DIREITA */
+.right {
+  width: 420px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card {
+  width: 100%;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 30px;
+  backdrop-filter: blur(10px);
+}
+
+.card h2 {
+  margin-bottom: 10px;
+}
+
+input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: white;
+  margin-top: 10px;
+}
+
+button {
+  width: 100%;
+  margin-top: 15px;
+  padding: 14px;
+  border: none;
+  border-radius: 8px;
+  background: var(--blue);
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+button:hover {
+  background: var(--blue-light);
+}
+
+.result {
+  margin-top: 20px;
+  display: none;
+}
+
+.field {
+  margin-bottom: 10px;
+}
+
+.label {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.value {
+  font-weight: bold;
+}
+
+.error {
+  color: #f87171;
+  margin-top: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="left">
+    <div class="left-content">
+      <h1>Verificação de Diploma</h1>
+      <p>Consulte a autenticidade de diplomas registrados na instituição.</p>
+    </div>
+  </div>
+
+  <div class="right">
+    <div class="card">
+
+      <h2>Consulta Pública</h2>
+      <p class="label">Digite o número de registro</p>
+
+      <input type="text" id="codigo" placeholder="Ex: 123456">
+
+      <button onclick="verificar()">Verificar</button>
+
+      <div id="erro" class="error"></div>
+
+      <div id="resultado" class="result">
+        <div class="field">
+          <div class="label">Nome</div>
+          <div id="nome" class="value"></div>
+        </div>
+
+        <div class="field">
+          <div class="label">Instituição</div>
+          <div id="instituicao" class="value"></div>
+        </div>
+
+        <div class="field">
+          <div class="label">Curso</div>
+          <div id="curso" class="value"></div>
+        </div>
+
+        <div class="field">
+          <div class="label">Conclusão</div>
+          <div id="conclusao" class="value"></div>
+        </div>
+
+        <div class="field">
+          <div class="label">Registro</div>
+          <div id="registro" class="value"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+const supabase = window.supabase.createClient(
+  "SUA_URL_AQUI",
+  "SUA_ANON_KEY_AQUI"
+);
+
+async function verificar() {
+  const codigo = document.getElementById("codigo").value.trim();
+  const erro = document.getElementById("erro");
+  const resultado = document.getElementById("resultado");
+
+  erro.innerText = "";
+  resultado.style.display = "none";
+
+  if (!codigo) {
+    erro.innerText = "Digite um número de registro.";
+    return;
+  }
+
+  const { data, error } = await supabase
+    .from("diplomas")
+    .select("*")
+    .eq("registro", codigo)
+    .single();
+
+  if (error || !data) {
+    erro.innerText = "Registro não encontrado.";
+    return;
+  }
+
+  nome.innerText = data.nome;
+  instituicao.innerText = data.instituicao;
+  curso.innerText = data.curso;
+  conclusao.innerText = data.conclusao;
+  registro.innerText = data.registro;
+
+  resultado.style.display = "block";
+}
+</script>
+
+</body>
+</html>
