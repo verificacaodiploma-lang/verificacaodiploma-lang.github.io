@@ -4,26 +4,24 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Verificação de Diploma atualizado2026</title>
+<title>Verificação de Diploma</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
 :root {
   --bg: #020617;
-  --card: rgba(255,255,255,0.05);
-  --blue: #2563eb;
-  --blue-light: #3b82f6;
+  --blue: #3b82f6;
+  --blue-strong: #2563eb;
   --text: #e5e7eb;
   --muted: #94a3b8;
-  --border: rgba(255,255,255,0.1);
 }
 
 * { box-sizing: border-box; }
 
 body {
   margin: 0;
-  font-family: 'Segoe UI', sans-serif;
+  font-family: "Inter", sans-serif;
   background: radial-gradient(circle at top, #0b1120, #020617);
   color: var(--text);
 }
@@ -45,19 +43,25 @@ body {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, rgba(2,6,23,0.95), rgba(2,6,23,0.6));
+  background: linear-gradient(90deg, rgba(2,6,23,0.95), rgba(2,6,23,0.5));
 }
 
 .left-content {
   position: relative;
   z-index: 2;
-  padding: 80px;
+  padding: 90px 70px;
   max-width: 520px;
 }
 
+.left small {
+  color: var(--blue);
+  letter-spacing: 2px;
+  font-size: 12px;
+}
+
 .left h1 {
-  font-size: 48px;
-  margin-bottom: 16px;
+  font-size: 52px;
+  margin: 10px 0;
 }
 
 .left p {
@@ -67,30 +71,38 @@ body {
 
 /* DIREITA */
 .right {
-  width: 460px;
+  width: 480px;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px;
 }
 
+/* CARD */
 .card {
   width: 100%;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 18px;
+  margin: 20px;
   padding: 35px;
-  backdrop-filter: blur(15px);
-  box-shadow: 0 0 40px rgba(37,99,235,0.15);
+  border-radius: 18px;
+  background: rgba(15,23,42,0.6);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(59,130,246,0.2);
+  box-shadow: 0 0 40px rgba(59,130,246,0.15);
 }
 
 /* TÍTULO */
 .card h2 {
   font-size: 24px;
+  margin-bottom: 5px;
 }
 
 .card h2 span {
   color: var(--blue);
+}
+
+.sub {
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 20px;
 }
 
 /* INPUT */
@@ -98,17 +110,15 @@ input {
   width: 100%;
   padding: 14px;
   border-radius: 10px;
-  border: 1px solid var(--border);
+  border: 1px solid rgba(255,255,255,0.1);
   background: rgba(255,255,255,0.03);
   color: white;
-  margin-top: 15px;
   outline: none;
-  transition: 0.2s;
 }
 
 input:focus {
   border-color: var(--blue);
-  box-shadow: 0 0 10px rgba(37,99,235,0.3);
+  box-shadow: 0 0 10px rgba(59,130,246,0.4);
 }
 
 /* BOTÃO */
@@ -116,18 +126,17 @@ button {
   width: 100%;
   margin-top: 20px;
   padding: 15px;
-  border: none;
   border-radius: 10px;
-  background: linear-gradient(90deg, var(--blue), var(--blue-light));
+  border: none;
+  background: var(--blue-strong);
   color: white;
   font-weight: bold;
   cursor: pointer;
-  transition: 0.3s;
+  transition: 0.2s;
 }
 
 button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 25px rgba(37,99,235,0.4);
+  background: var(--blue);
 }
 
 /* RESULTADO */
@@ -137,12 +146,12 @@ button:hover {
 }
 
 .field {
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 .label {
+  font-size: 12px;
   color: var(--muted);
-  font-size: 13px;
 }
 
 .value {
@@ -163,8 +172,9 @@ button:hover {
 
   <div class="left">
     <div class="left-content">
-      <h1>Verificação de Diploma</h1>
-      <p>Consulte a autenticidade de diplomas registrados na instituição.</p>
+      <small>SISTEMA DE VERIFICAÇÃO</small>
+      <h1>Verificação<br>de Diploma</h1>
+      <p>Consulte a autenticidade de diplomas emitidos pela instituição.</p>
     </div>
   </div>
 
@@ -172,8 +182,9 @@ button:hover {
     <div class="card">
 
       <h2>Consulta <span>Pública</span></h2>
+      <div class="sub">Digite o número do registro acadêmico</div>
 
-      <input type="text" id="codigo" placeholder="Digite o número de registro">
+      <input type="text" id="codigo" placeholder="Ex: 20230012345">
 
       <button onclick="verificar()">VERIFICAR</button>
 
