@@ -1,1 +1,310 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Faveni — Verificação de Diploma</title>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+:root{
+--verde:#2f4f3e;
+--preto:#0f172a;
+--dourado:#d4af37;
+--bg:#f6f7f6;
+--card:#ffffff;
+--muted:#6b7280;
+--borda:#e5e7eb;
+--erro:#b91c1c;
+}
+
+body{
+margin:0;
+font-family:"Inter",system-ui;
+background:var(--bg);
+color:var(--preto);
+}
+
+.topo{
+background:var(--preto);
+color:white;
+padding:28px 20px;
+text-align:center;
+}
+
+.topo h1{
+margin:0;
+font-size:20px;
+letter-spacing:.5px;
+}
+
+.topo span{
+display:block;
+color:var(--dourado);
+font-size:13px;
+margin-top:6px;
+}
+
+main{
+max-width:800px;
+margin:40px auto;
+padding:0 20px;
+}
+
+.card{
+background:var(--card);
+border-radius:16px;
+padding:26px;
+box-shadow:0 8px 20px rgba(0,0,0,.06);
+border:1px solid var(--borda);
+}
+
+.search{
+display:flex;
+gap:10px;
+margin-bottom:14px;
+}
+
+input{
+flex:1;
+padding:14px;
+border-radius:10px;
+border:1px solid #d1d5db;
+font-size:15px;
+}
+
+button{
+background:var(--verde);
+color:white;
+border:none;
+padding:14px 18px;
+border-radius:10px;
+font-weight:700;
+cursor:pointer;
+}
+
+button:hover{
+filter:brightness(.95);
+}
+
+.helper{
+font-size:13px;
+color:var(--muted);
+margin-bottom:12px;
+}
+
+#feedback{
+color:var(--erro);
+font-weight:700;
+margin-bottom:12px;
+}
+
+.resultado{
+display:none;
+margin-top:20px;
+border:1px solid var(--borda);
+border-radius:14px;
+padding:20px;
+}
+
+.label{
+font-size:12px;
+color:var(--muted);
+margin-top:10px;
+}
+
+.valor{
+font-weight:700;
+}
+
+.status{
+margin-top:14px;
+display:inline-block;
+padding:8px 12px;
+border-radius:999px;
+font-weight:800;
+font-size:13px;
+}
+
+.ok{
+background:#ecfdf5;
+color:#166534;
+}
+
+.warn{
+background:#fff1f2;
+color:#b91c1c;
+}
+
+.bloqueio{
+display:none;
+margin-top:12px;
+padding:12px;
+border-radius:10px;
+background:#fff1f2;
+color:#b91c1c;
+font-weight:700;
+}
+
+.print{
+margin-top:16px;
+}
+
+.print button{
+width:100%;
+background:var(--preto);
+}
+
+footer{
+margin-top:50px;
+text-align:center;
+font-size:13px;
+color:var(--muted);
+padding-bottom:20px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="topo">
+<h1>Faveni</h1>
+<span>Portal de Autenticidade Acadêmica</span>
+</div>
+
+<main>
+<div class="card">
+
+<div class="search">
+<input id="q" placeholder="Digite o número do diploma">
+<button id="btn">Consultar</button>
+</div>
+
+<div class="helper">Verifique autenticidade acadêmica com segurança.</div>
+
+<div id="feedback"></div>
+
+<div id="resultado" class="resultado">
+
+<div id="status" class="status ok">Registro ativo</div>
+
+<div id="bloqueio" class="bloqueio">
+Aguardando pagamento. Documento bloqueado.
+</div>
+
+<div class="label">Nome</div>
+<div class="valor" id="nome">—</div>
+
+<div class="label">Curso</div>
+<div class="valor" id="curso">—</div>
+
+<div class="label">Conclusão</div>
+<div class="valor" id="data">—</div>
+
+<div class="label">Registro</div>
+<div class="valor" id="registro">—</div>
+
+<div class="print">
+<button onclick="imprimir()">Imprimir</button>
+</div>
+
+</div>
+
+</div>
+</main>
+
+<footer>
+© 2026 Faveni — Todos os direitos reservados
+</footer>
+
+<script>
+
+const supabase = window.supabase.createClient(
+"https://fghkqwxhrdodyhvfrlzz.supabase.co",
+"sb_publishable_cwIQcgCl1O0z_CKo6E8xUQ_Y-VoPyve"
+);
+
+let alunoAtual=null;
+
+function normalizar(v){
+return String(v||"")
+.normalize("NFD")
+.replace(/[\u0300-\u036f]/g,"")
+.replace(/[^a-zA-Z0-9]/g,"")
+.toUpperCase();
+}
+
+function limpar(){
+document.getElementById("nome").textContent="—";
+document.getElementById("curso").textContent="—";
+document.getElementById("data").textContent="—";
+document.getElementById("registro").textContent="—";
+document.getElementById("resultado").style.display="none";
+document.getElementById("feedback").textContent="";
+}
+
+document.getElementById("btn").onclick=async()=>{
+
+const valor=document.getElementById("q").value.trim();
+
+limpar();
+
+if(!valor){
+document.getElementById("feedback").textContent="Informe um código.";
+return;
+}
+
+const {data,error}=await supabase
+.from("registros")
+.select("*")
+.eq("universidade_slug","faveni");
+
+if(error){
+document.getElementById("feedback").textContent="Erro na consulta.";
+return;
+}
+
+const aluno=data.find(a=>normalizar(a.registro)===normalizar(valor));
+
+if(!aluno){
+document.getElementById("feedback").textContent="Registro não encontrado.";
+return;
+}
+
+alunoAtual=aluno;
+
+document.getElementById("nome").textContent=aluno.nome;
+document.getElementById("curso").textContent=aluno.curso;
+document.getElementById("data").textContent=aluno.conclusao;
+document.getElementById("registro").textContent=aluno.registro;
+
+const statusEl=document.getElementById("status");
+const bloqueio=document.getElementById("bloqueio");
+
+if(aluno.mensalidade_atrasada){
+statusEl.textContent="Aguardando pagamento";
+statusEl.className="status warn";
+bloqueio.style.display="block";
+}else{
+statusEl.textContent="Registro ativo";
+statusEl.className="status ok";
+bloqueio.style.display="none";
+}
+
+document.getElementById("resultado").style.display="block";
+
+};
+
+function imprimir(){
+if(alunoAtual && alunoAtual.mensalidade_atrasada){
+alert("Pagamento pendente. Impressão bloqueada.");
+return;
+}
+window.print();
+}
+
+</script>
+
+</body>
+</html>
