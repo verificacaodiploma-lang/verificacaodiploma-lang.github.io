@@ -3,8 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Faveni — Verificação de Diploma</title>
+<title>Instituto de Psicanálise — Verificação de Diploma</title>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
 :root{
 --verde:#2f4f3e;
@@ -16,6 +18,7 @@
 --borda:#e5e7eb;
 --erro:#b91c1c;
 }
+
 body{
 margin:0;
 font-family:"Inter",system-ui;
@@ -29,6 +32,7 @@ color:white;
 padding:28px 20px;
 text-align:center;
 }
+
 .topo h1{
 margin:0;
 font-size:20px;
@@ -165,8 +169,8 @@ padding-bottom:20px;
 <body>
 
 <div class="topo">
-<h1>Faveni</h1>
-<span>Portal de Autenticidade Acadêmica</span>
+<h1>Instituto de Psicanálise</h1>
+<span>Saúde e Bem-Estar • Portal de Autenticidade</span>
 </div>
 
 <main>
@@ -211,7 +215,7 @@ Aguardando pagamento. Documento bloqueado.
 </main>
 
 <footer>
-© 2026 Faveni — Todos os direitos reservados
+© 2026 Instituto de Psicanálise — Todos os direitos reservados
 </footer>
 
 <script>
@@ -254,7 +258,7 @@ return;
 const {data,error}=await supabase
 .from("registros")
 .select("*")
-.eq("universidade_slug","faveni");
+.eq("universidade_slug","instituto");
 
 if(error){
 document.getElementById("feedback").textContent="Erro na consulta.";
