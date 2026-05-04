@@ -1,4 +1,3 @@
-```html
 <!doctype html>
 <html lang="pt-BR">
 <head>
@@ -9,11 +8,13 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
 <style>
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
-  background: #0b1f1a;
+  font-family: 'Poppins', sans-serif;
+  background: #061511;
   color: white;
 }
 
@@ -32,25 +33,29 @@ body {
 .overlay {
   position: absolute;
   inset: 0;
-  background: rgba(0, 50, 30, 0.75);
+  background: linear-gradient(90deg, rgba(6,21,17,0.95) 0%, rgba(6,21,17,0.8) 40%, rgba(6,21,17,0.3) 100%);
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 60px;
+  padding: 80px;
 }
 
 .overlay h1 {
-  font-size: 48px;
+  font-size: 56px;
   margin: 0;
+  font-weight: 700;
+  letter-spacing: 2px;
 }
 
 .overlay p {
-  opacity: 0.8;
+  opacity: 0.7;
+  font-size: 16px;
+  margin-top: 10px;
 }
 
 /* DIREITA */
 .right {
-  width: 400px;
+  width: 420px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -59,41 +64,70 @@ body {
 /* PAINEL */
 .panel {
   width: 90%;
-  padding: 30px;
-  border-radius: 16px;
-  background: rgba(0,0,0,0.4);
-  backdrop-filter: blur(10px);
+  padding: 35px;
+  border-radius: 18px;
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(18px);
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+}
+
+.panel h2 {
+  margin: 0 0 10px;
+  font-weight: 600;
 }
 
 .panel h2 span {
   color: #22c55e;
 }
 
-input {
-  width: 100%;
-  padding: 12px;
-  margin-bottom: 15px;
-  border-radius: 8px;
-  border: none;
-  background: rgba(255,255,255,0.1);
-  color: white;
+.panel p {
+  font-size: 14px;
+  opacity: 0.7;
+  margin-bottom: 20px;
 }
 
-button {
+/* INPUT */
+input {
   width: 100%;
   padding: 14px;
-  border-radius: 8px;
+  margin-bottom: 15px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.04);
+  color: white;
+  outline: none;
+  transition: 0.2s;
+}
+
+input:focus {
+  border-color: #22c55e;
+  background: rgba(255,255,255,0.06);
+}
+
+/* BOTÃO */
+button {
+  width: 100%;
+  padding: 15px;
+  border-radius: 10px;
   border: none;
   background: linear-gradient(90deg, #16a34a, #22c55e);
   color: white;
-  font-weight: bold;
+  font-weight: 600;
   cursor: pointer;
+  transition: 0.2s;
+}
+
+button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 5px 20px rgba(34,197,94,0.4);
 }
 
 button:disabled {
-  opacity: 0.6;
+  opacity: 0.5;
 }
 
+/* LOADING */
 .loading {
   display: none;
   text-align: center;
@@ -114,27 +148,44 @@ button:disabled {
   to { transform: rotate(360deg); }
 }
 
+/* RESULTADO */
 .resultado {
   margin-top: 20px;
-  background: rgba(255,255,255,0.05);
+  background: rgba(255,255,255,0.04);
   padding: 15px;
-  border-radius: 10px;
+  border-radius: 12px;
   display: none;
 }
 
-.field { margin-bottom: 8px; }
-.label { font-size: 12px; opacity: 0.6; }
-.value { font-weight: bold; }
+.field { margin-bottom: 10px; }
 
-.status { margin-bottom: 8px; font-weight: bold; }
+.label {
+  font-size: 11px;
+  opacity: 0.5;
+}
+
+.value {
+  font-weight: 600;
+}
+
+.status {
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
 .ok { color: #4ade80; }
 .warn { color: #f87171; }
 
-#error { color: #f87171; margin-top: 10px; }
+#error {
+  color: #f87171;
+  margin-top: 10px;
+}
 
+/* MOBILE */
 @media(max-width:900px){
   .container { flex-direction: column; }
-  .right { width: 100%; padding: 20px 0; }
+  .right { width: 100%; padding: 30px 0; }
+  .overlay { padding: 40px; }
 }
 </style>
 </head>
@@ -154,7 +205,7 @@ button:disabled {
     <div class="panel">
 
       <h2>Consulta <span>Pública</span></h2>
-      <p>Digite o número de registro</p>
+      <p>Digite o número do seu registro acadêmico para consultar suas informações.</p>
 
       <input id="codigo" placeholder="Ex: 20230012345">
       <button id="btnVerificar" onclick="verificar()">VERIFICAR</button>
@@ -307,4 +358,3 @@ function imprimir(){
 
 </body>
 </html>
-```
