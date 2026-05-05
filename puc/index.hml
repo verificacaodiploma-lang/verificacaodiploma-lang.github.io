@@ -61,7 +61,6 @@ body{
 .red{background:#d90429;}
 .gray{background:#ccc;color:black;}
 
-/* modal resultado */
 .modal{
   position:fixed;
   top:0;
@@ -120,7 +119,7 @@ const banco = window.supabase.createClient(
   "sb_publishable_cwIQcgCl1O0z_CKo6E8xUQ_Y-VoPyve"
 );
 
-// abre modal com input
+// abre modal
 function abrirBusca(){
 
   const modal = document.createElement("div");
@@ -140,12 +139,13 @@ function abrirBusca(){
   document.body.appendChild(modal);
 }
 
-// fecha modal
+// fechar modal
 function fechar(){
-  document.querySelector(".modal").remove();
+  const modal = document.querySelector(".modal");
+  if(modal) modal.remove();
 }
 
-// consulta no banco
+// buscar no Supabase
 async function buscar(){
 
   const reg = document.getElementById("registro").value;
@@ -157,7 +157,7 @@ async function buscar(){
 
   document.querySelector(".box").innerHTML = "Verificando...";
 
-  const { data, error } = await supabase
+  const { data, error } = await banco
     .from("alunos")
     .select("*")
     .eq("registro", reg)
