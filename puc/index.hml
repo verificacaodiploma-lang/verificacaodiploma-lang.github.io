@@ -3,7 +3,10 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>PUC - Pontifícia Universidade de Católica</title>
+
+<title>PUC - Portal Acadêmico</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
 body{
@@ -57,6 +60,43 @@ body{
 .yellow{background:#e6b800;color:black;}
 .red{background:#d90429;}
 .gray{background:#ccc;color:black;}
+
+/* modal resultado */
+.modal{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.4);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:9999;
+}
+
+.box{
+  background:white;
+  padding:30px;
+  border-radius:10px;
+  text-align:center;
+  width:320px;
+}
+
+input{
+  width:80%;
+  padding:10px;
+  margin-top:10px;
+}
+
+button.buscar{
+  margin-top:10px;
+  padding:10px 20px;
+  background:#1e3a8a;
+  color:white;
+  border:none;
+  cursor:pointer;
+}
 </style>
 </head>
 
@@ -65,7 +105,7 @@ body{
 <header class="hero">
   <img src="logo.png">
   <h1>PUC Campinas</h1>
-  <button onclick="ir()">VERIFICAÇÃO DE ALUNO</button>
+  <button onclick="abrirBusca()">VERIFICAÇÃO DE ALUNO</button>
 </header>
 
 <div class="cards">
@@ -75,51 +115,73 @@ body{
 </div>
 
 <script>
-function ir(){
+const supabase = window.supabase.createClient(
+  "SUA_URL_AQUI",
+  "SUA_ANON_KEY_AQUI"
+);
 
-  const overlay = document.createElement('div');
-  overlay.style = `
-    position:fixed;
-    top:0;
-    left:0;
-    width:100%;
-    height:100%;
-    background:white;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    flex-direction:column;
-    z-index:9999;
+// abre modal com input
+function abrirBusca(){
+
+  const modal = document.createElement("div");
+  modal.className = "modal";
+
+  modal.innerHTML = `
+    <div class="box">
+      <h3>Consultar Diploma</h3>
+      <input id="registro" placeholder="Digite o registro"/>
+      <br>
+      <button class="buscar" onclick="buscar()">Verificar</button>
+      <br><br>
+      <button onclick="fechar()">Cancelar</button>
+    </div>
   `;
 
-  overlay.innerHTML = `
-    <div style="
-      border:4px solid #ddd;
-      border-top:4px solid #1e3a8a;
-      width:40px;
-      height:40px;
-      border-radius:50%;
-      animation:spin 1s linear infinite;
-    "></div>
+  document.body.appendChild(modal);
+}
 
-    <p style="margin-top:12px;font-weight:600;color:#1e3a8a;">
-      Redirecionando para ambiente seguro...
-    </p>
+// fecha modal
+function fechar(){
+  document.querySelector(".modal").remove();
+}
+
+// consulta no banco
+async function buscar(){
+
+  const reg = document.getElementById("registro").value;
+
+  if(!reg){
+    alert("Digite um registro");
+    return;
+  }
+
+  document.querySelector(".box").innerHTML = "Verificando...";
+
+  const { data, error } = await supabase
+    .from("alunos")
+    .select("*")
+    .eq("registro", reg)
+    .single();
+
+  if(error || !data){
+    document.querySelector(".box").innerHTML = `
+      <p style="color:red;">Registro não encontrado</p>
+      <button onclick="fechar()">Fechar</button>
+    `;
+    return;
+  }
+
+  document.querySelector(".box").innerHTML = `
+    <h3>Verificação Confirmada</h3>
+    <p><b>Nome:</b> ${data.nome}</p>
+    <p><b>Curso:</b> ${data.curso}</p>
+    <p><b>Conclusão:</b> ${data.conclusao}</p>
+    <p style="color:green;"><b>✔ Diploma válido</b></p>
+    <br>
+    <button onclick="fechar()">Fechar</button>
   `;
-
-  document.body.appendChild(overlay);
-
-  setTimeout(()=>{
-    window.location.href = "verificar.html";
-  },1500);
 }
 </script>
-
-<style>
-@keyframes spin{
-  to{transform:rotate(360deg);}
-}
-</style>
 
 </body>
 </html>
