@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>UniCesumar — Verificação de Registro</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6fb;
+      margin: 0;
+      padding: 20px;
+    }
+    .card {
+      max-width: 500px;
+      background: #fff;
+      margin: auto;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 10px 25px rgba(0,0,0,.1);
+    }
+    h1 {
+      text-align: center;
+      color: #1976d2;
+    }
+    input, button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      font-size: 16px;
+    }
+    button {
+      background: #1976d2;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #125aa0;
+    }
+    #resultado {
+      margin-top: 20px;
+      display: none;
+    }
+    .linha {
+      margin-bottom: 6px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="card">
+    <h1>Verificação de Registro</h1>
+
+    <input id="busca" placeholder="Digite o número do registro">
+    <button onclick="buscarRegistro()">Pesquisar</button>
+
+    <div id="resultado">
+      <div class="linha"><strong>Nome:</strong> <span id="nome"></span></div>
+      <div class="linha"><strong>Instituição:</strong> <span id="instituicao"></span></div>
+      <div class="linha"><strong>Curso:</strong> <span id="curso"></span></div>
+      <div class="linha"><strong>Conclusão:</strong> <span id="conclusao"></span></div>
+      <div class="linha"><strong>Registro:</strong> <span id="registro"></span></div>
+      <div class="linha"><strong>Situação:</strong> <span id="situacao"></span></div>
+    </div>
+  </div>
+
+  <script>
+    function buscarRegistro(){
+      const valor = document.getElementById('busca').value.trim();
+      const resultado = document.getElementById('resultado');
+
+      const registros = {
+        "576456-86": {
+          nome: "Cássio Augusto Rosa",
+          instituicao: "Universidade Cesumar (UniCesumar)",
+          curso: "Pós-Graduação em Engenharia Mecatrônica",
+          conclusao: "14/08/2020",
+          registro: "576456-86",
+          situacao: "Regular"
+        },
+        "56774-75": {
+          nome: "Miriam Cristina Tavares Rossetto",
+          instituicao: "Universidade Cesumar (UniCesumar)",
+          curso: "Licenciatura em Pedagogia",
+          conclusao: "10/12/2025",
+          registro: "56774-75",
+          situacao: "Regular"
+        },
+        "475457-86": {
+          nome: "Ricardo Donizeti dos Santos Zivolo",
+          instituicao: "Universidade Cesumar (UniCesumar)",
+          curso: "Bacharel em Nutrição",
+          conclusao: "05/06/2025",
+          registro: "475457-86",
+          situacao: "Regular"
+        },
+        "476467-87": {
+          nome: "Monarisa Ribas da Silva",
+          instituicao: "Universidade Cesumar (UniCesumar)",
+          curso: "Graduação em Terapia Integrativa e Complementar",
+          conclusao: "13/03/2025",
+          registro: "476467-87",
+          situacao: "Regular"
+        },
+        "55676-76": {
+          nome: "Flávia Maraísa de Souza Januário",
+          instituicao: "Universidade Cesumar (UniCesumar)",
+          curso: "Licenciatura em Filosofia",
+          conclusao: "10/09/2021",
+          registro: "55676-76",
+          situacao: "Regular"
+        }
+      };
+
+      if(!registros[valor]){
+        alert("Registro não localizado.");
+        resultado.style.display = "none";
+        return;
+      }
+
+      const dados = registros[valor];
+      document.getElementById("nome").innerText = dados.nome;
+      document.getElementById("instituicao").innerText = dados.instituicao;
+      document.getElementById("curso").innerText = dados.curso;
+      document.getElementById("conclusao").innerText = dados.conclusao;
+      document.getElementById("registro").innerText = dados.registro;
+      document.getElementById("situacao").innerText = dados.situacao;
+
+      resultado.style.display = "block";
+    }
+  </script>
+
+</body>
+</html>
