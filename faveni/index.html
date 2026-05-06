@@ -7,6 +7,7 @@
 <title>Faveni — Consulta Pública</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
 * { box-sizing: border-box; }
@@ -16,7 +17,6 @@ body {
   font-family: 'Poppins', sans-serif;
   background: #061511;
   color: white;
-  overflow: hidden;
 }
 
 .container {
@@ -28,7 +28,6 @@ body {
 .left {
   flex: 1;
   position: relative;
-  overflow: hidden;
 }
 
 .left::before {
@@ -37,7 +36,6 @@ body {
   inset: 0;
   background: url("https://images.unsplash.com/photo-1523240795612-9a054b0db644") center/cover no-repeat;
   filter: blur(3px) brightness(0.6);
-  transform: scale(1.1);
 }
 
 .left::after {
@@ -51,38 +49,16 @@ body {
   position: relative;
   z-index: 2;
   padding: 80px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  height: 100%;
 }
 
 .logo {
-  display: flex;
-  align-items: center;
-  gap: 10px;
   font-size: 42px;
   font-weight: 700;
-}
-
-.logo span {
-  font-size: 14px;
-  opacity: 0.7;
-  display: block;
 }
 
 .slogan {
   margin-top: 20px;
   color: #4ade80;
-  max-width: 400px;
-}
-
-.footer-left {
-  position: absolute;
-  bottom: 40px;
-  left: 80px;
-  font-size: 14px;
-  opacity: 0.7;
 }
 
 /* DIREITA */
@@ -102,11 +78,9 @@ body {
   border-radius: 20px;
   background: rgba(255,255,255,0.03);
   border: 1px solid rgba(0,255,150,0.15);
-  box-shadow: 0 0 40px rgba(0,255,150,0.1);
-  backdrop-filter: blur(20px);
 }
 
-/* Ícone topo */
+/* Ícone */
 .icon-top {
   width: 60px;
   height: 60px;
@@ -118,15 +92,7 @@ body {
   margin-bottom: 20px;
 }
 
-/* TÍTULO */
-h2 {
-  margin: 0;
-  font-size: 28px;
-}
-
-h2 span {
-  color: #22c55e;
-}
+h2 span { color: #22c55e; }
 
 .subtitle {
   margin: 15px 0 25px;
@@ -134,7 +100,6 @@ h2 span {
   opacity: 0.7;
 }
 
-/* INPUT */
 .input {
   width: 100%;
   padding: 14px;
@@ -145,7 +110,6 @@ h2 span {
   margin-bottom: 20px;
 }
 
-/* BOTÃO */
 .btn {
   width: 100%;
   padding: 15px;
@@ -157,31 +121,19 @@ h2 span {
   cursor: pointer;
 }
 
-/* FOOTER CARD */
-.card-footer {
-  margin-top: 30px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  opacity: 0.7;
-  font-size: 13px;
-}
-
-/* QUADRADO DECORATIVO */
-.square {
-  position: absolute;
-  top: 120px;
-  right: 450px;
-  width: 40px;
-  height: 40px;
-  border: 1px solid rgba(0,255,150,0.2);
+.resultado {
+  margin-top: 20px;
+  padding: 15px;
   border-radius: 10px;
-  transform: rotate(25deg);
+  display: none;
 }
 
-@media(max-width:900px){
-  .container { flex-direction: column; }
-  .right { width: 100%; }
+.erro {
+  background: rgba(255,0,0,0.2);
+}
+
+.sucesso {
+  background: rgba(0,255,150,0.1);
 }
 </style>
 </head>
@@ -190,64 +142,87 @@ h2 span {
 
 <div class="container">
 
-  <!-- ESQUERDA -->
   <div class="left">
     <div class="overlay">
-
-      <div class="logo">
-        🔥 FAVENI
-      </div>
-      <div style="opacity:.7">Faculdade Venda Nova do Imigrante</div>
-
+      <div class="logo">🔥 FAVENI</div>
       <div class="slogan">
         Excelência que transforma, educação que constrói o futuro.
       </div>
-
-      <div class="footer-left">
-        ● EAD Faveni 2018
-      </div>
-
     </div>
   </div>
 
-  <!-- DIREITA -->
   <div class="right">
-
     <div class="card">
 
-              <div class="icon-top">
-        <svg widh="26" viewBox="0 0 24 24" fill="none">
-          <path d="M14 2H6C4 .9 2 4 2.9 4
-            4V20C4 21.1 20 20V8L14 2Z" stroke="#22c55e"
-            stroke-width="1.5">/
-          <circle cx/="11" cy="13" r="13"
-            stroke="#22c55e" stroke-width="1.5">/
-            <path d="M16 18L13.5 15.5"
-              stroke="#22c55e" stroke-width="1.5>/
-             </svg>
-              </div>
+      <div class="icon-top">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+          <circle cx="11" cy="11" r="7" stroke="#22c55e" stroke-width="1.5"/>
+          <path d="M20 20L17 17" stroke="#22c55e" stroke-width="1.5"/>
+        </svg>
+      </div>
+
       <h2>Consulta <span>Pública</span></h2>
 
       <div class="subtitle">
-        Digite o número do seu registro acadêmico para consultar suas informações.
+        Digite seu número de registro
       </div>
 
-      <input class="input" placeholder="Ex: 20230012345">
+      <input id="registroInput" class="input" placeholder="Ex: 20230012345">
 
-      <button class="btn">VERIFICAR</button>
+      <button class="btn" onclick="verificar()">VERIFICAR</button>
 
-      <div class="card-footer">
-        🔒 Seus dados estão protegidos e utilizados apenas para consulta.
-      </div>
+      <div id="resultado" class="resultado"></div>
 
     </div>
-
   </div>
 
-  <!-- DECOR -->
-  <div class="square"></div>
-
 </div>
+
+<script>
+const banco = window.supabase.createClient(
+  "https://fghkqwxhrdodyhvfrlzz.supabase.co",
+  "sb_publishable_cwIQcgCl1O0z_CKo6E8xUQ_Y-VoPyve"
+);
+
+async function verificar(){
+  const valor = document.getElementById("registroInput").value.trim();
+  const box = document.getElementById("resultado");
+
+  box.style.display = "block";
+  box.classList.remove("erro","sucesso");
+
+  if(!valor){
+    box.classList.add("erro");
+    box.innerHTML = "Digite um registro.";
+    return;
+  }
+
+  box.innerHTML = "Buscando...";
+
+  const { data, error } = await banco
+    .from("registros")
+    .select("*")
+    .eq("registro", valor)
+    .single();
+
+  if(error || !data){
+    box.classList.add("erro");
+    box.innerHTML = "Registro não encontrado.";
+    return;
+  }
+
+  box.classList.add("sucesso");
+
+  const status = data.status || "Sem status";
+  const statusCor = status.toLowerCase() === "ativo" ? "lime" : "orange";
+
+  box.innerHTML = `
+    <strong>Aluno:</strong> ${data.nome || "-"}<br>
+    <strong>Curso:</strong> ${data.curso || "-"}<br>
+    <strong>Status:</strong> <span style="color:${statusCor}">${status}</span>
+  `;
+}
+</script>
 
 </body>
 </html>
