@@ -4,7 +4,7 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 
-<title>UNICID — Verificação de Diplomas</title>
+<title>Cruzeiro do Sul — Validação de Diplomas</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
@@ -13,11 +13,13 @@
 
 <style>
 :root{
---azul:#0b3d2e;
---verde:#16a34a;
---bg:#f5f7fb;
+--azul:#0a2e6e;
+--azul2:#123c8c;
+--bg:#f4f7fb;
 --card:#ffffff;
 --border:#e5e7eb;
+--ok:#15803d;
+--error:#b91c1c;
 }
 
 body{
@@ -28,7 +30,7 @@ background:var(--bg);
 
 /* TOPO */
 .topbar{
-background:#06281f;
+background:#061a3a;
 color:#fff;
 padding:8px 40px;
 font-size:13px;
@@ -36,16 +38,14 @@ display:flex;
 justify-content:space-between;
 }
 
-.topbar span{opacity:.8}
-
 /* NAV */
 .nav{
 background:var(--azul);
 color:white;
 padding:15px 40px;
 display:flex;
-align-items:center;
 justify-content:space-between;
+align-items:center;
 }
 
 .logo{
@@ -59,43 +59,19 @@ gap:25px;
 font-size:14px;
 }
 
-.search{
-background:#0f5132;
-padding:8px 12px;
-border-radius:6px;
-}
-
-.search input{
-background:transparent;
-border:none;
-color:white;
-outline:none;
-}
-
 /* HERO */
 .hero{
 display:flex;
 padding:50px 40px;
-background:linear-gradient(90deg,#0b3d2e,#0f766e);
+background:linear-gradient(90deg,var(--azul),var(--azul2));
 color:white;
 gap:40px;
 }
 
-.hero-left{
-flex:2;
-}
+.hero-left{flex:2;}
+.hero-right{flex:1;display:flex;flex-direction:column;gap:15px;}
 
-.hero-right{
-flex:1;
-display:flex;
-flex-direction:column;
-gap:15px;
-}
-
-.hero h1{
-margin:0;
-font-size:34px;
-}
+.hero h1{margin:0;font-size:34px;}
 
 .card-banner{
 background:white;
@@ -125,7 +101,7 @@ width:100%;
 padding:12px;
 border:none;
 border-radius:6px;
-background:var(--verde);
+background:var(--azul);
 color:white;
 font-weight:600;
 cursor:pointer;
@@ -175,35 +151,25 @@ background:white;
 
 <body>
 
-<!-- TOPO -->
 <div class="topbar">
 <span>Acessibilidade • A+ A-</span>
 <span>Portal Acadêmico</span>
 </div>
 
-<!-- NAV -->
 <div class="nav">
-<div class="logo">UNICID</div>
-
+<div class="logo">Cruzeiro do Sul</div>
 <div class="menu">
 <div>Cursos</div>
-<div>Estude na Unicid</div>
-<div>Benefícios</div>
-<div>A Universidade</div>
-</div>
-
-<div class="search">
-🔍 <input placeholder="O que você procura?">
+<div>Institucional</div>
+<div>Contato</div>
 </div>
 </div>
 
-<!-- HERO -->
 <div class="hero">
 
 <div class="hero-left">
-
-<h1>Verificação de Diplomas</h1>
-<p>Consulte a autenticidade do seu diploma de forma rápida e segura.</p>
+<h1>Validação de Diplomas</h1>
+<p>Consulte a autenticidade do seu diploma emitido pela instituição.</p>
 
 <div class="consulta">
 <input id="q" class="input" placeholder="Digite o número do diploma">
@@ -212,25 +178,15 @@ background:white;
 <div id="erro" style="color:red;margin-top:10px;"></div>
 <div id="resultado" class="resultado"></div>
 </div>
-
 </div>
 
 <div class="hero-right">
-
-<div class="card-banner">
-<strong>Para sua carreira</strong><br>
-Escolha ter estrela ⭐
-</div>
-
-<div class="card-banner">
-Inscreva-se no vestibular com desconto
+<div class="card-banner"><strong>Ensino de excelência</strong><br>Construa seu futuro</div>
+<div class="card-banner">Processo seletivo aberto</div>
 </div>
 
 </div>
 
-</div>
-
-<!-- RESULTADO DETALHADO -->
 <div class="container">
 
 <div class="grid">
@@ -275,7 +231,7 @@ const ctx = document.getElementById("canvas").getContext("2d");
 let atual = null;
 
 function gerarProtocolo(){
-return "UNI-" + Math.random().toString(36).substring(2,8).toUpperCase();
+return "CRZ-" + Math.random().toString(36).substring(2,8).toUpperCase();
 }
 
 function normalizar(v){
@@ -284,9 +240,11 @@ return String(v).replace(/[^a-zA-Z0-9]/g,"").toUpperCase();
 
 function desenhar(d){
 ctx.clearRect(0,0,420,260);
-ctx.fillStyle="#003b73";
+
+ctx.fillStyle="#0a2e6e";
 ctx.font="bold 18px Arial";
-ctx.fillText("UNICID",160,40);
+ctx.fillText("CRUZEIRO DO SUL",90,40);
+
 ctx.font="14px Arial";
 ctx.fillText(d.nome,40,120);
 ctx.fillText(d.curso,40,150);
@@ -302,7 +260,7 @@ erro.innerText="";
 const { data } = await banco
 .from("registros")
 .select("*")
-.eq("universidade_slug","unicid");
+.eq("universidade_slug","cruzeiro");
 
 const aluno = data.find(a => normalizar(a.registro) === normalizar(codigo));
 
