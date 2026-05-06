@@ -4,53 +4,83 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>UNICID — Sistema de Verificação de Diplomas</title>
+
+<title>UNICID — Verificação de Diplomas</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
 <style>
 :root{
---bg:#f4f8ff;
+--primary:#0b3d2e;
+--secondary:#0f766e;
+--bg:#f4f6f9;
 --card:#ffffff;
---accent:#0072ce;
---muted:#6b7280;
---border:#d9e4f5;
---error:#b91c1c;
+--border:#e5e7eb;
 --ok:#15803d;
+--error:#b91c1c;
 }
 
 body{
-font-family:Inter,Arial;
-background:var(--bg);
 margin:0;
+font-family:'Poppins',sans-serif;
+background:var(--bg);
 }
 
-header{
-background:linear-gradient(90deg,#0072ce15,#0072ce05);
-padding:24px;
-border-bottom:1px solid var(--border);
+/* NAVBAR */
+.nav{
+background:var(--primary);
+color:#fff;
+padding:15px 40px;
 display:flex;
 justify-content:space-between;
+align-items:center;
 }
 
-.brand{
+.logo{
 font-weight:700;
-color:#003b73;
+font-size:20px;
 }
 
-.container{
-max-width:980px;
-margin:36px auto;
-padding:20px;
+.menu{
+display:flex;
+gap:20px;
+font-size:14px;
+opacity:.9;
 }
 
-.search{
-background:#fff;
+/* HERO */
+.hero{
+background:linear-gradient(90deg,var(--primary),var(--secondary));
+color:white;
+padding:60px 40px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.hero h1{
+margin:0;
+font-size:36px;
+}
+
+.hero p{
+margin-top:15px;
+opacity:.85;
+}
+
+/* SEARCH BOX */
+.search-box{
+max-width:900px;
+margin:-40px auto 0;
+background:white;
 padding:20px;
 border-radius:12px;
 display:flex;
-gap:16px;
+gap:15px;
+box-shadow:0 10px 30px rgba(0,0,0,.08);
 }
 
 input{
@@ -61,12 +91,20 @@ border:1px solid var(--border);
 }
 
 button{
-background:var(--accent);
+background:#16a34a;
 color:#fff;
 border:none;
 padding:14px;
 border-radius:8px;
 cursor:pointer;
+font-weight:600;
+}
+
+/* CONTENT */
+.container{
+max-width:1000px;
+margin:30px auto;
+padding:20px;
 }
 
 .content{
@@ -76,9 +114,11 @@ margin-top:20px;
 }
 
 .card{
-background:#fff;
+background:white;
 padding:22px;
 border-radius:12px;
+box-shadow:0 6px 18px rgba(0,0,0,.05);
+flex:1;
 }
 
 .label{
@@ -86,11 +126,11 @@ display:inline-block;
 margin-top:12px;
 padding:6px 12px;
 border-radius:8px;
-font-weight:700;
+font-weight:600;
 }
 
-.ok{ background:#e0fce9;color:var(--ok);}
-.warn{ background:#ffe5e5;color:var(--error);}
+.ok{background:#dcfce7;color:var(--ok);}
+.warn{background:#fee2e2;color:var(--error);}
 
 #qrcode{margin-top:15px;}
 
@@ -99,31 +139,47 @@ background:#fff;
 border-radius:8px;
 }
 
-@media(max-width:820px){
+@media(max-width:800px){
 .content{flex-direction:column;}
+.hero{flex-direction:column;gap:20px;}
+.search-box{flex-direction:column;}
 }
 </style>
 </head>
 
 <body>
 
-<header>
-<div class="brand">UNICID</div>
-<div>Portal Acadêmico</div>
-</header>
+<!-- NAV -->
+<div class="nav">
+<div class="logo">🎓 UNICID</div>
+<div class="menu">
+<span>Cursos</span>
+<span>Institucional</span>
+<span>Contato</span>
+</div>
+</div>
 
-<div class="container">
+<!-- HERO -->
+<div class="hero">
+<div>
+<h1>Verificação de Diplomas</h1>
+<p>Consulte a autenticidade do seu diploma de forma rápida e segura.</p>
+</div>
+</div>
 
-<div class="search">
+<!-- BUSCA -->
+<div class="search-box">
 <input id="q" placeholder="Digite o número do diploma">
 <button onclick="verificar()">Consultar</button>
 </div>
+
+<div class="container">
 
 <div id="erro" style="color:red;margin-top:10px;"></div>
 
 <div class="content">
 
-<div class="card" style="flex:1">
+<div class="card">
 
 <h2 id="nome">—</h2>
 <div id="curso"></div>
@@ -173,7 +229,6 @@ return String(v).replace(/[^a-zA-Z0-9]/g,"").toUpperCase();
 }
 
 function desenhar(d){
-
 ctx.clearRect(0,0,420,260);
 
 ctx.fillStyle="#003b73";
@@ -189,7 +244,6 @@ ctx.fillText(d.nome,40,120);
 ctx.font="14px Arial";
 ctx.fillText(d.curso,40,150);
 ctx.fillText(d.conclusao,40,175);
-
 }
 
 async function verificar(){
