@@ -255,17 +255,36 @@ document.getElementById("feedback").textContent="Informe um código.";
 return;
 }
 
-const {data,error}=await supabase
-.from("registros")
-.select("*")
-.eq("universidade_slug","psicanalise");
+const { data, error } = await supabase
+  .from("registros")
+  .select("*")
+  .eq("universidade_slug", "psicanalise");
 
-if(error){
-document.getElementById("feedback").textContent="Erro na consulta.";
-return;
+console.log("ERRO:", error);
+console.log("TOTAL REGISTROS:", data?.length);
+console.log("DADOS:", data);
+
+if (error) {
+  document.getElementById("feedback").textContent =
+    "Erro na consulta: " + error.message;
+  return;
 }
 
-const aluno=data.find(a=>normalizar(a.registro)===normalizar(valor));
+if (!data || data.length === 0) {
+  document.getElementById("feedback").textContent =
+    "Nenhum registro encontrado para a slug psicanalise.";
+  return;
+}
+
+const aluno = data.find(
+  a => normalizar(a.registro) === normalizar(valor)
+);
+
+if (!aluno) {
+  document.getElementById("feedback").textContent =
+    "Registro não encontrado. Verifique o número digitado.";
+  return;
+}
 
 if(!aluno){
 document.getElementById("feedback").textContent="Registro não encontrado.";
