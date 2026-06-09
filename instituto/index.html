@@ -258,7 +258,7 @@ return;
 const {data,error}=await supabase
 .from("registros")
 .select("*")
-.eq("universidade_slug","instituto");
+.eq("universidade_slug","psicanalise");
 
 if(error){
 document.getElementById("feedback").textContent="Erro na consulta.";
